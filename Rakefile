@@ -20,7 +20,7 @@ task :create_dockerfile do
 end
 
 task :build_docker_image do
-  sh('docker build . -t gocd-server')
+  sh("docker build . -t gocd-server:v#{gocd_version}")
 end
 
 task :commit_dockerfile do
