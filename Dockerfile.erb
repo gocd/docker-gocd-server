@@ -23,7 +23,6 @@ ARG UID=1000
 
 ADD ${DOWNLOAD_URL} /tmp/go-server.zip
 
-
 # allow mounting ssh keys, dotfiles, and the go server config and data
 VOLUME /home/go /godata
 
@@ -36,7 +35,7 @@ ENV LANG=en_US.utf8
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g ${GID} -S go && \
+  addgroup -g ${GID} go && \
   adduser -D -u ${UID} -G go go && \
 # install dependencies and other helpful CLI tools
   apk --update-cache upgrade && \
