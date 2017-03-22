@@ -21,6 +21,10 @@ ARG DOWNLOAD_URL="<%= download_url %>"
 ARG GID=1000
 ARG UID=1000
 
+LABEL gocd.version=${GOCD_VERSION} \
+  description="GoCD server based on alpine linux" \
+  maintainer="GoCD <go-cd-dev@googlegroups.com>"
+
 ADD ${DOWNLOAD_URL} /tmp/go-server.zip
 
 # allow mounting ssh keys, dotfiles, and the go server config and data
