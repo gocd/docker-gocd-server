@@ -2,23 +2,42 @@
 
 An Alpine Linux based docker image for [GoCD server](https://www.gocd.io).
 
-# Usage
+# Docker Image
+*You could either download the latest built image from docker hub or build one
+locally with the zip file from GoCD Download webpage.*
 
+## 1.1 Download the latest Image
+```bash
+docker pull gocd/gocd-server:latest
+```
+
+## 1.2 Build One Locally
+Build one with version `17.3.0`; zip file is from GoCD [`download`][0] webpage.
+```bash
+GOCD_VERSION=17.3.0 \
+GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.io/binaries/17.3.0-4704/generic/go-server-17.3.0-4704.zip \
+rake build_image
+```
+
+# Usage
 Start the container with this:
 
-```
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server
+```bash
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:latest
 ```
 
-This will expose container ports 8153(http) and 8154(https) onto your server. You can now open http://localhost:8153 and https://localhost:8154
+This will expose container ports 8153(http) and 8154(https) onto your server.
+You can now open `http://localhost:8153` and `https://localhost:8154`
 
 # Available configuration options
 
 ## Mounting volumes
 
-The GoCD server will store all configuration, pipeline history database, artifacts, plugins, and logs into `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`
+The GoCD server will store all configuration, pipeline history database,
+artifacts, plugins, and logs into `/godata`. If you'd like to provide secure
+credentials like SSH private keys among other things, you can mount `/home/go`
 
-```
+```bash
 docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server
 ```
 
@@ -26,7 +45,7 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-se
 
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
 
-```
+```bash
 docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server
 ```
 
@@ -85,3 +104,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+[0]: https://www.gocd.io/download/
