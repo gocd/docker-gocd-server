@@ -1,46 +1,54 @@
+# Copyright 2017 ThoughtWorks, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 FROM alpine:latest
+
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-ARG GO_WORKING_DIR="/go-working-dir"
-ARG VOLUME_DIR="/godata"
+ARG GOCD_VERSION="17.3.0"
+ARG DOWNLOAD_URL="https://download.gocd.io/binaries/17.3.0-4704/generic/go-server-17.3.0-4704.zip"
+ARG GID=1000
+ARG UID=1000
 
-ARG GOCD_VERSION="17.2.0"
-ARG DOWNLOAD_URL="https://download.gocd.io/binaries/17.2.0-4587/generic/go-server-17.2.0-4587.zip"
+LABEL gocd.version=${GOCD_VERSION} \
+  description="GoCD server based on alpine linux" \
+  maintainer="GoCD <go-cd-dev@googlegroups.com>"
 
 ADD ${DOWNLOAD_URL} /tmp/go-server.zip
 
-RUN apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash && \
-# unzip the zip file into /go-server, after stripping the first path prefix
-  unzip /tmp/go-server.zip -d / && \
-  mv go-server-${GOCD_VERSION} /go-server && \
-# Exposing volumes in a simple manner, and setup links behind-the-scenes
-# to match GoCD's directory structure
-  mkdir -p ${GO_WORKING_DIR} && \
-  mkdir -p ${VOLUME_DIR}/artifacts && \
-  ln -sf ${VOLUME_DIR}/artifacts ${GO_WORKING_DIR}/artifacts && \
-  mkdir -p ${VOLUME_DIR}/config && \
-  ln -sf ${VOLUME_DIR}/config ${GO_WORKING_DIR}/config && \
-  mkdir -p ${VOLUME_DIR}/db && \
-  ln -sf ${VOLUME_DIR}/db ${GO_WORKING_DIR}/db && \
-  mkdir -p ${VOLUME_DIR}/logs && \
-  ln -sf ${VOLUME_DIR}/logs ${GO_WORKING_DIR}/logs && \
-  mkdir -p ${VOLUME_DIR}/plugins && \
-  ln -sf ${VOLUME_DIR}/plugins ${GO_WORKING_DIR}/plugins && \
-  mkdir -p ${VOLUME_DIR}/addons && \
-  ln -sf ${VOLUME_DIR}/addons ${GO_WORKING_DIR}/addons && \
-  adduser -D go && \
-  chown -R go:go ${VOLUME_DIR} ${GO_WORKING_DIR}
-
 # allow mounting ssh keys, dotfiles, and the go server config and data
-VOLUME ["/home/go", "${VOLUME_DIR}"]
+VOLUME /home/go /godata
 
 # the ports that go server runs on
 EXPOSE 8153 8154
 
-USER go
-ENTRYPOINT ["/sbin/tini", "--"]
-WORKDIR ${GO_WORKING_DIR}
-ENV GO_CONFIG_DIR=${GO_WORKING_DIR}/config
-ENV SERVER_WORK_DIR=${GO_WORKING_DIR}
-ENV STDOUT_LOG_FILE=${GO_WORKING_DIR}/logs
-CMD ["/go-server/server.sh"]
+# force encoding
+ENV LANG=en_US.utf8
+
+RUN \
+# add our user and group first to make sure their IDs get assigned consistently,
+# regardless of whatever dependencies get added
+  addgroup -g ${GID} go && \
+  adduser -D -u ${UID} -G go go && \
+# install dependencies and other helpful CLI tools
+  apk --update-cache upgrade && \
+  apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
+# unzip the zip file into /go-server, after stripping the first path prefix
+  unzip /tmp/go-server.zip -d / && \
+  rm /tmp/go-server.zip && \
+  mv go-server-${GOCD_VERSION} /go-server
+
+ADD docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
