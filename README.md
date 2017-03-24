@@ -7,7 +7,7 @@ An Alpine Linux based docker image for [GoCD server](https://www.gocd.io).
 Start the container with this:
 
 ```
-docker run -p8153:8153 -p8154:8154 gocd/gocd-server
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server. You can now open http://localhost:8153 and https://localhost:8154
