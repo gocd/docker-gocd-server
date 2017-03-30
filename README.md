@@ -44,6 +44,22 @@ The GoCD server runs as the `go` user, the location of the various directories i
 | `/godata/plugins`   | the directory containing GoCD plugins                                            |
 | `/home/go`          | the home directory for the GoCD server                                           |
 
+# Determine Server IP and Ports on Host
+
+Once the GoCD server is up, we should be able to determine its ip address and the ports mapped onto the host by doing the following:
+The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
+If you have started the container with
+```bash
+$ docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.3.0
+```
+
+Then, the below commands will determine to GoCD server IP, server port and ssl port
+```bash
+$ docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' server
+$ docker inspect --format='{{(index (index .NetworkSettings.Ports "8153/tcp") 0).HostPort}}' server
+$ docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' server
+```
+
 # Troubleshooting
 
 ## The GoCD server does not come up
