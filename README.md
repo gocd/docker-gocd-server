@@ -8,7 +8,7 @@ locally with the zip file from GoCD Download webpage.*
 
 ## 1.1 Download the latest Image
 ```bash
-docker pull gocd/gocd-server:latest
+docker pull gocd/gocd-server:v17.3.0
 ```
 
 ## 1.2 Build One Locally
@@ -23,7 +23,7 @@ rake build_image
 Start the container with this:
 
 ```bash
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:latest
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v17.3.0
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server.
