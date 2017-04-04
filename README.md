@@ -41,6 +41,28 @@ credentials like SSH private keys among other things, you can mount `/home/go`
 docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server
 ```
 
+> **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
+
+## Installing plugins
+
+All plugins can be installed under `/godata`.
+
+```
+mkdir -p /path/to/godata/plugins/external
+curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/external/plugin.jar
+chown -R 1000 /path/to/godata/plugins
+```
+
+## Installing addons
+
+All addons can be installed under `/godata`.
+
+```
+mkdir -p /path/to/godata/addons
+curl --location --fail https://example.com/addon.jar > /path/to/godata/addons/plugin.jar
+chown -R 1000 /path/to/godata/addons
+```
+
 ## Tweaking JVM options (memory, heap etc)
 
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
