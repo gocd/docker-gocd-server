@@ -34,6 +34,16 @@ curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/
 chown -R 1000 /path/to/godata/plugins
 ```
 
+## Installing addons
+
+All addons can be installed under `/godata`.
+
+```
+mkdir -p /path/to/godata/addons
+curl --location --fail https://example.com/addon.jar > /path/to/godata/addons/plugin.jar
+chown -R 1000 /path/to/godata/addons
+```
+
 ## Tweaking JVM options (memory, heap etc)
 
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
