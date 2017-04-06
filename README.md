@@ -109,6 +109,12 @@ $ docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0)
 - Check the STDOUT to see if there is any output that indicates failures `docker logs CONTAINER_ID`
 - Check the server logs `docker exec -it CONTAINER_ID tail -f /godata/logs/go-server.log` (or check the log file in the volume mount, if you're using one)
 
+
+# Bugs with Docker Server Image 17.3.0
+
+* Anyone using our docker image as the base image for your customized image, and writing to `/home/go` as part of your Dockerfile, these changes in `/home/go` don't persist while you start the container with your custom image.
+ A fix has been applied [here](https://github.com/gocd/docker-gocd-server/commit/d49ffa4) and will be available for subsequent releases of the docker images.
+ 
 # License
 
 ```plain
