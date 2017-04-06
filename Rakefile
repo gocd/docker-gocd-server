@@ -10,6 +10,7 @@ end
 
 gocd_version = get_var('GOCD_VERSION')
 download_url = get_var('GOCD_SERVER_DOWNLOAD_URL')
+tag = ENV['TAG']
 
 task :create_dockerfile do
   template = File.read('Dockerfile.erb')
@@ -20,7 +21,8 @@ task :create_dockerfile do
 end
 
 task :build_docker_image do
-  sh("docker build . -t gocd-server:v#{gocd_version}")
+  tag_name = tag || "v#{gocd_version}"
+  sh("docker build . -t gocd-server:#{tag_name}")
 end
 
 task :commit_dockerfile do
