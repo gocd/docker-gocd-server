@@ -42,6 +42,10 @@ task :git_push do
   sh("git push upstream --tags")
 end
 
+task :docker_push do
+  sh("docker push #{ENV['ORG']}/gocd-server:#{gocd_version}}")
+end
+
 desc "Publish to dockerhub"
 task :publish => [:create_dockerfile, :commit_dockerfile, :create_tag, :git_push]
 
