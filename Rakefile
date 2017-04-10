@@ -10,6 +10,9 @@ end
 
 gocd_version = get_var('GOCD_VERSION')
 download_url = get_var('GOCD_SERVER_DOWNLOAD_URL')
+gocd_full_version = get_var('GOCD_FULL_VERSION')
+gocd_git_sha = get_var('GOCD_GIT_SHA')
+
 tag = ENV['TAG']
 
 task :create_dockerfile do
@@ -42,8 +45,18 @@ task :git_push do
   sh("git push upstream --tags")
 end
 
-task :docker_push do
-  sh("docker push #{ENV['ORG']}/gocd-server:#{gocd_version}}")
+task :docker_push_experimental => :build_image do
+  org = ENV['EXP_ORG'] || 'gocdexperimental'
+  sh("docker tag gocd-server:v#{gocd_version} #{org}/gocd-server:v#{gocd_full_version}")
+  sh("docker push #{org}/gocd-server:v#{gocd_full_version}")
+end
+
+task :docker_push_stable do
+  org = ENV['ORG'] || 'gocd'
+  experimental_org = ENV['EXP_ORG'] || 'gocdexperimental'
+  sh("docker pull #{experimental_org}/gocd-server:v#{gocd_full_version}")
+  sh("docker tag #{experimental_org}/gocd-server:v#{gocd_full_version} #{org}/gocd-server:v#{gocd_version}")
+  sh("docker push #{org}/gocd-server:v#{gocd_version}")
 end
 
 desc "Publish to dockerhub"
