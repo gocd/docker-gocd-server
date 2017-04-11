@@ -16,16 +16,13 @@ FROM alpine:latest
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-ARG GOCD_VERSION="<%= gocd_version %>"
-ARG DOWNLOAD_URL="<%= download_url %>"
-ARG GID=1000
-ARG UID=1000
-
-LABEL gocd.version=${GOCD_VERSION} \
+LABEL gocd.version="<%= gocd_version %>" \
   description="GoCD server based on alpine linux" \
-  maintainer="GoCD <go-cd-dev@googlegroups.com>"
+  maintainer="GoCD <go-cd-dev@googlegroups.com>" \
+  gocd.full.version="<%= gocd_full_version %>" \
+  gocd.git.sha="<%= gocd_git_sha %>"
 
-ADD ${DOWNLOAD_URL} /tmp/go-server.zip
+ADD "<%= download_url %>" /tmp/go-server.zip
 
 # allow mounting ssh keys, dotfiles, and the go server config and data
 VOLUME /godata
@@ -39,15 +36,15 @@ ENV LANG=en_US.utf8
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g ${GID} go && \
-  adduser -D -u ${UID} -G go go && \
+  addgroup -g 1000 go && \
+  adduser -D -u 1000 -G go go && \
 # install dependencies and other helpful CLI tools
   apk --update-cache upgrade && \
   apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-${GOCD_VERSION} /go-server
+  mv go-server-<%= gocd_version %> /go-server
 
 ADD docker-entrypoint.sh /
 
