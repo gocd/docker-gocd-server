@@ -16,19 +16,16 @@ FROM alpine:latest
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-ARG GOCD_VERSION="17.3.0"
-ARG DOWNLOAD_URL="https://download.gocd.io/binaries/17.3.0-4704/generic/go-server-17.3.0-4704.zip"
-ARG GID=1000
-ARG UID=1000
-
-LABEL gocd.version=${GOCD_VERSION} \
+LABEL gocd.version="17.4.0" \
   description="GoCD server based on alpine linux" \
-  maintainer="GoCD <go-cd-dev@googlegroups.com>"
+  maintainer="GoCD <go-cd-dev@googlegroups.com>" \
+  gocd.full.version="17.4.0-4892" \
+  gocd.git.sha="ab17b819e73477a47401744fa64f64fda55c26e8"
 
-ADD ${DOWNLOAD_URL} /tmp/go-server.zip
+ADD "https://download.gocd.io/experimental/binaries/17.4.0-4892/generic/go-server-17.4.0-4892.zip" /tmp/go-server.zip
 
 # allow mounting ssh keys, dotfiles, and the go server config and data
-VOLUME /home/go /godata
+VOLUME /godata
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -39,15 +36,15 @@ ENV LANG=en_US.utf8
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g ${GID} go && \
-  adduser -D -u ${UID} -G go go && \
+  addgroup -g 1000 go && \
+  adduser -D -u 1000 -G go go && \
 # install dependencies and other helpful CLI tools
   apk --update-cache upgrade && \
   apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-${GOCD_VERSION} /go-server
+  mv go-server-17.4.0 /go-server
 
 ADD docker-entrypoint.sh /
 
