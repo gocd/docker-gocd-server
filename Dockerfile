@@ -37,7 +37,7 @@ RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
   addgroup -g 1000 go && \
-  adduser -D -u 1000 -G go go && \
+  adduser -D -u 1000 -G go -s /bin/sh -h /home/go go && \
 # install dependencies and other helpful CLI tools
   apk --update-cache upgrade && \
   apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
