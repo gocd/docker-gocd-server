@@ -24,9 +24,6 @@ LABEL gocd.version="<%= gocd_version %>" \
 
 ADD "<%= download_url %>" /tmp/go-server.zip
 
-# allow mounting ssh keys, dotfiles, and the go server config and data
-VOLUME /godata
-
 # the ports that go server runs on
 EXPOSE 8153 8154
 
