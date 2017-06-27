@@ -16,13 +16,13 @@ FROM alpine:latest
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.5.0" \
+LABEL gocd.version="17.6.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.5.0-5095" \
-  gocd.git.sha="3130b5ba96f8155ae86fefb261a559d4c7493326"
+  gocd.full.version="17.6.0-5142" \
+  gocd.git.sha="be1ff52e07d80323fcc615864a64f3afe83b7016"
 
-ADD "https://download.gocd.org/experimental/binaries/17.5.0-5095/generic/go-server-17.5.0-5095.zip" /tmp/go-server.zip
+ADD "https://download.gocd.org/binaries/17.6.0-5142/generic/go-server-17.6.0-5142.zip" /tmp/go-server.zip
 
 # allow mounting ssh keys, dotfiles, and the go server config and data
 VOLUME /godata
@@ -44,7 +44,7 @@ RUN \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.5.0 /go-server
+  mv go-server-17.6.0 /go-server
 
 ADD docker-entrypoint.sh /
 
