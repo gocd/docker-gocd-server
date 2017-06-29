@@ -23,14 +23,22 @@ task :create_dockerfile do
   end
 end
 
+task :create_readme do
+  template = File.read('README.md.erb')
+  renderer = ERB.new(template, nil, '-')
+  File.open('README.md', 'w') do |f|
+    f.puts(renderer.result(binding))
+  end
+end
+
 task :build_docker_image do
   tag_name = tag || "v#{gocd_version}"
   sh("docker build . -t gocd-server:#{tag_name}")
 end
 
 task :commit_dockerfile do
-  sh("git add Dockerfile")
-  sh("git commit -m 'Update Dockerfile with GoCD Version #{gocd_version}' --author 'GoCD CI User <godev+gocd-ci-user@thoughtworks.com>'")
+  sh("git add Dockerfile README.md")
+  sh("git commit -m 'Update Dockerfile and README.md with GoCD Version #{gocd_version}' --author 'GoCD CI User <godev+gocd-ci-user@thoughtworks.com>'")
 end
 
 task :create_tag do
@@ -60,7 +68,7 @@ task :docker_push_stable do
 end
 
 desc "Publish to dockerhub"
-task :publish => [:create_dockerfile, :commit_dockerfile, :create_tag, :git_push]
+task :publish => [:create_dockerfile, :create_readme, :commit_dockerfile, :create_tag, :git_push]
 
 desc "Build an image locally"
 task :build_image => [:create_dockerfile, :build_docker_image]
