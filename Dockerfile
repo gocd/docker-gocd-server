@@ -24,9 +24,6 @@ LABEL gocd.version="17.7.0" \
 
 ADD "https://download.gocd.org/binaries/17.7.0-5147/generic/go-server-17.7.0-5147.zip" /tmp/go-server.zip
 
-# allow mounting ssh keys, dotfiles, and the go server config and data
-VOLUME /godata
-
 # the ports that go server runs on
 EXPOSE 8153 8154
 
