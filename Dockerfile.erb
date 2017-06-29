@@ -22,8 +22,6 @@ LABEL gocd.version="<%= gocd_version %>" \
   gocd.full.version="<%= gocd_full_version %>" \
   gocd.git.sha="<%= gocd_git_sha %>"
 
-ADD "<%= download_url %>" /tmp/go-server.zip
-
 # allow mounting ssh keys, dotfiles, and the go server config and data
 VOLUME /godata
 
@@ -39,8 +37,10 @@ RUN \
   addgroup -g 1000 go && \
   adduser -D -u 1000 -G go go && \
 # install dependencies and other helpful CLI tools
-  apk --update-cache upgrade && \
-  apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
+  apk --no-cache upgrade && \
+  apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
+# download the zip file
+  curl --fail --location --silent --show-error "<%= download_url %>" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
