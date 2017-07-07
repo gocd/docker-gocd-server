@@ -47,7 +47,7 @@ RUN \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.7.0 /go-server
+  mv go-server-${GOCD_MAJOR} /go-server
 
 ADD docker-entrypoint.sh /
 
