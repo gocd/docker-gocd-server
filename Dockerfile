@@ -16,15 +16,13 @@ FROM alpine:latest
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.7.0" \
+LABEL gocd.version="17.8.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.7.0-5147" \
-  gocd.git.sha="53fdb1b15184f93966059a42429bf9ed0bfdee59"
+  gocd.full.version="17.8.0-5277" \
+  gocd.git.sha="32ff863cce99f97b76abb1b88469a793e3b1adc5"
 
-ADD "https://download.gocd.org/binaries/17.7.0-5147/generic/go-server-17.7.0-5147.zip" /tmp/go-server.zip
-
-# allow mounting ssh keys, dotfiles, and the go server config and data
+# allow mounting the go server config and data
 VOLUME /godata
 
 # the ports that go server runs on
@@ -39,12 +37,14 @@ RUN \
   addgroup -g 1000 go && \
   adduser -D -u 1000 -G go go && \
 # install dependencies and other helpful CLI tools
-  apk --update-cache upgrade && \
-  apk add --update-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec && \
+  apk --no-cache upgrade && \
+  apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
+# download the zip file
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.8.0-5277/generic/go-server-17.8.0-5277.zip" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.7.0 /go-server
+  mv go-server-17.8.0 /go-server
 
 ADD docker-entrypoint.sh /
 
