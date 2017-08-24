@@ -31,11 +31,14 @@ EXPOSE 8153 8154
 # force encoding
 ENV LANG=en_US.utf8
 
+# allow alternative go uid
+ENV UID=1000
+
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g 1000 go && \
-  adduser -D -u 1000 -G go go && \
+  addgroup -g ${UID} go && \
+  adduser -D -u ${UID} -G go go && \
 # install dependencies and other helpful CLI tools
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
