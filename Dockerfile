@@ -32,7 +32,7 @@ EXPOSE 8153 8154
 ENV LANG=en_US.utf8
 
 # allow alternative go uid
-ENV UID=1000
+ARG UID=1000
 
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
