@@ -1,3 +1,7 @@
+# Docker GoCD Server 17.9.0
+
+* log server output and logs to `STDOUT` in addition to writing logs to log files, so you can now watch all server logs using `docker logs`.
+
 # Docker GoCD Server 17.8.0
 
 * [e4fcb35](https://github.com/gocd/docker-gocd-server/commit/e4fcb355848877689fdf4d193d554573056c85f0) Reduce the docker GoCD server image's size by removing the downloaded binary after its extracted.

@@ -20,15 +20,13 @@ try() { echo "$ $@" 1>&2; "$@" || die "cannot $*"; }
 
 VOLUME_DIR="/godata"
 
-# these 3 vars are used by `/go-server/server.sh`, so we export
-export SERVER_WORK_DIR="/go-working-dir"
-export GO_CONFIG_DIR="/go-working-dir/config"
-export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
+SERVER_WORK_DIR="/go-working-dir"
+GO_CONFIG_DIR="/go-working-dir/config"
 
 # no arguments are passed so assume user wants to run the gocd server
 # we prepend "/go-server/server.sh" to the argument list
 if [[ $# -eq 0 ]] ; then
-	set -- /go-server/server.sh "$@"
+  set -- /go-server/server.sh "$@"
 fi
 
 # if running go server as root, then initialize directory structure and call ourselves as `go` user
@@ -63,8 +61,18 @@ if [ "$1" = '/go-server/server.sh' ]; then
       fi
     done
 
-	  try exec /sbin/tini -- su-exec go "$0" "$@" >> ${STDOUT_LOG_FILE} 2>&1
+    if [ ! -e "${SERVER_WORK_DIR}/config/log4j.properties" ]; then
+      try cp -rfv "/go-server/config/log4j.properties" "${SERVER_WORK_DIR}/config/log4j.properties"
+      try chown go:go "${VOLUME_DIR}/config/log4j.properties"
+    fi
+
+    try exec /sbin/tini -- su-exec go "$0" "$@"
   fi
 fi
 
+# these 3 vars are used by `/go-server/server.sh`, so we export
+export GO_CONFIG_DIR
+export SERVER_WORK_DIR
+export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
+export GO_SERVER_SYSTEM_PROPERTIES="${GO_SERVER_SYSTEM_PROPERTIES}${GO_SERVER_SYSTEM_PROPERTIES:+ }-Dgo.console.stdout=true"
 try exec "$@"
