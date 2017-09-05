@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:latest
+FROM alpine:3.6
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.8.0" \
+LABEL gocd.version="17.9.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.8.0-5277" \
-  gocd.git.sha="32ff863cce99f97b76abb1b88469a793e3b1adc5"
+  gocd.full.version="17.9.0-5368" \
+  gocd.git.sha="fd43db656e9d9b32d7ab9be1785208f346e9b1be"
 
 # allow mounting the go server config and data
 VOLUME /godata
@@ -40,11 +40,19 @@ RUN \
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.8.0-5277/generic/go-server-17.8.0-5277.zip" > /tmp/go-server.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.9.0-5368/generic/go-server-17.9.0-5368.zip" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.8.0 /go-server
+  mv go-server-17.9.0 /go-server && \
+# ensure that logs are printed to console output
+  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-server/config/log4j.properties && \
+  echo "" >> /go-server/config/log4j.properties && \
+  echo "" >> /go-server/config/log4j.properties && \
+  echo "# Log to stdout" >> /go-server/config/log4j.properties && \
+  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-server/config/log4j.properties && \
+  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-server/config/log4j.properties && \
+  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-server/config/log4j.properties
 
 ADD docker-entrypoint.sh /
 
