@@ -22,9 +22,6 @@ LABEL gocd.version="<%= gocd_version %>" \
   gocd.full.version="<%= gocd_full_version %>" \
   gocd.git.sha="<%= gocd_git_sha %>"
 
-# allow mounting the go server config and data
-VOLUME /godata
-
 # the ports that go server runs on
 EXPOSE 8153 8154
 
