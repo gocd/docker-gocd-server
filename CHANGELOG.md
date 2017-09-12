@@ -1,3 +1,8 @@
+# Docker GoCD Server 17.10.0
+
+* [90d8bc8](https://github.com/gocd/docker-gocd-server/commit/90d8bc8d9abef7198351fb4a7c35f88bde386ebe) Allow users to specify `uid` and `gid` as build args while building a docker image.
+* [8c3b9f9](https://github.com/gocd/docker-gocd-server/commit/8c3b9f90a81a296cc95f2f34e13c6eea39b172d0) Remove the volume instruction for godata directory. Fix for https://github.com/gocd/docker-gocd-server/issues/25
+
 # Docker GoCD Server 17.9.0
 
 * log server output and logs to `STDOUT` in addition to writing logs to log files, so you can now watch all server logs using `docker logs`.
