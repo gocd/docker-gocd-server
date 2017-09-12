@@ -16,14 +16,11 @@ FROM alpine:3.6
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.9.0" \
+LABEL gocd.version="17.10.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.9.0-5368" \
-  gocd.git.sha="fd43db656e9d9b32d7ab9be1785208f346e9b1be"
-
-# allow mounting the go server config and data
-VOLUME /godata
+  gocd.full.version="17.10.0-5380" \
+  gocd.git.sha="05598d88fd4dabdde1184faa4fbffc5f9406d0dc"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -31,20 +28,23 @@ EXPOSE 8153 8154
 # force encoding
 ENV LANG=en_US.utf8
 
+ARG UID=1000
+ARG GID=1000
+
 RUN \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g 1000 go && \
-  adduser -D -u 1000 -G go go && \
+  addgroup -g ${GID} go && \
+  adduser -D -u ${UID} -G go go && \
 # install dependencies and other helpful CLI tools
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.9.0-5368/generic/go-server-17.9.0-5368.zip" > /tmp/go-server.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.10.0-5380/generic/go-server-17.10.0-5380.zip" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.9.0 /go-server && \
+  mv go-server-17.10.0 /go-server && \
 # ensure that logs are printed to console output
   sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-server/config/log4j.properties && \
   echo "" >> /go-server/config/log4j.properties && \
