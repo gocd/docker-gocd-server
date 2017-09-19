@@ -91,14 +91,14 @@ Once the GoCD server is up, we should be able to determine its ip address and th
 The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
 If you have started the container with
 ```bash
-$ docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.10.0
+docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.10.0
 ```
 
 Then, the below commands will determine to GoCD server IP, server port and ssl port
 ```bash
-$ docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' server
-$ docker inspect --format='{{(index (index .NetworkSettings.Ports "8153/tcp") 0).HostPort}}' server
-$ docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' server
+docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' server
+docker inspect --format='{{(index (index .NetworkSettings.Ports "8153/tcp") 0).HostPort}}' server
+docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' server
 ```
 
 # Troubleshooting
