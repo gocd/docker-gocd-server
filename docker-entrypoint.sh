@@ -61,9 +61,9 @@ if [ "$1" = '/go-server/server.sh' ]; then
       fi
     done
 
-    if [ ! -e "${SERVER_WORK_DIR}/config/log4j.properties" ]; then
-      try cp -rfv "/go-server/config/log4j.properties" "${SERVER_WORK_DIR}/config/log4j.properties"
-      try chown go:go "${VOLUME_DIR}/config/log4j.properties"
+     if [ ! -e "${SERVER_WORK_DIR}/config/logback-include.xml" ]; then
+      try cp -rfv "/go-server/config/logback-include.xml" "${SERVER_WORK_DIR}/config/logback-include.xml"
+      try chown go:go "${VOLUME_DIR}/config/logback-include.xml"
     fi
 
     try exec /sbin/tini -- su-exec go "$0" "$@"

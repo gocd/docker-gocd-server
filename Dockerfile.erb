@@ -44,15 +44,9 @@ RUN \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-<%= gocd_version %> /go-server && \
-# ensure that logs are printed to console output
-  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-server/config/log4j.properties && \
-  echo "" >> /go-server/config/log4j.properties && \
-  echo "" >> /go-server/config/log4j.properties && \
-  echo "# Log to stdout" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-server/config/log4j.properties
+  mv go-server-<%= gocd_version %> /go-server
+
+COPY logback-include.xml /go-server/config/logback-include.xml
 
 ADD docker-entrypoint.sh /
 
