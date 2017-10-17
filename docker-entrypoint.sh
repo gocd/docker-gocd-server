@@ -46,7 +46,7 @@ if [ "$1" = '/go-server/server.sh' ]; then
     # ensure proper directory structure in the volume directory
     if [ ! -e "${VOLUME_DIR}" ]; then
       try mkdir "${VOLUME_DIR}"
-      try chown go:go "${SERVER_WORK_DIR}"
+      try chown go:go "${VOLUME_DIR}"
     fi
 
     for each_dir in "${server_dirs[@]}"; do
