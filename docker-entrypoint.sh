@@ -20,8 +20,6 @@ try() { echo "$ $@" 1>&2; "$@" || die "cannot $*"; }
 
 VOLUME_DIR="/godata"
 
-SERVER_WORK_DIR="/go-working-dir"
-GO_CONFIG_DIR="/go-working-dir/config"
 
 # no arguments are passed so assume user wants to run the gocd server
 # we prepend "/go-server/server.sh" to the argument list
@@ -33,6 +31,10 @@ fi
 if [ "$1" = '/go-server/server.sh' ]; then
 
   if [ "$(id -u)" = '0' ]; then
+    export SERVER_WORK_DIR="/go-working-dir"
+    export GO_CONFIG_DIR="/go-working-dir/config"
+    export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
+
     server_dirs=(artifacts config db logs plugins addons)
 
     yell "Creating directories and symlinks to hold GoCD configuration, data, and logs"
@@ -71,8 +73,5 @@ if [ "$1" = '/go-server/server.sh' ]; then
 fi
 
 # these 3 vars are used by `/go-server/server.sh`, so we export
-export GO_CONFIG_DIR
-export SERVER_WORK_DIR
-export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
 export GO_SERVER_SYSTEM_PROPERTIES="${GO_SERVER_SYSTEM_PROPERTIES}${GO_SERVER_SYSTEM_PROPERTIES:+ }-Dgo.console.stdout=true"
 try exec "$@"
