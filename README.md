@@ -8,14 +8,14 @@ locally with the zip file from GoCD Download webpage.*
 
 ## 1.1 Download the latest Image
 ```bash
-docker pull gocd/gocd-server:v17.10.0
+docker pull gocd/gocd-server:v17.11.0
 ```
 
 ## 1.2 Build One Locally
-Build one with version `17.10.0`; zip file is from GoCD [`download`][0] webpage.
+Build one with version `17.11.0`; zip file is from GoCD [`download`][0] webpage.
 ```bash
-GOCD_VERSION=17.10.0 \
-GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/17.10.0-5380/generic/go-server-17.10.0-5380.zip \
+GOCD_VERSION=17.11.0 \
+GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/17.11.0-5520/generic/go-server-17.11.0-5520.zip \
 rake build_image
 ```
 
@@ -23,7 +23,7 @@ rake build_image
 Start the container with this:
 
 ```bash
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v17.10.0
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v17.11.0
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server.
@@ -38,7 +38,7 @@ artifacts, plugins, and logs into `/godata`. If you'd like to provide secure
 credentials like SSH private keys among other things, you can mount `/home/go`
 
 ```bash
-docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v17.10.0
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v17.11.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
@@ -68,7 +68,7 @@ chown -R 1000 /path/to/godata/addons
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
 
 ```bash
-docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v17.10.0
+docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v17.11.0
 ```
 
 # Under the hood
@@ -91,7 +91,7 @@ Once the GoCD server is up, we should be able to determine its ip address and th
 The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
 If you have started the container with
 ```bash
-docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.10.0
+docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.11.0
 ```
 
 Then, the below commands will determine to GoCD server IP, server port and ssl port

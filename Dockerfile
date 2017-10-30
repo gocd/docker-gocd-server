@@ -16,11 +16,11 @@ FROM alpine:3.6
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.10.0" \
+LABEL gocd.version="17.11.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.10.0-5380" \
-  gocd.git.sha="05598d88fd4dabdde1184faa4fbffc5f9406d0dc"
+  gocd.full.version="17.11.0-5520" \
+  gocd.git.sha="9f6909e2f64b07d2dce5cecd4ea5b92b8e19d6b1"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -40,19 +40,13 @@ RUN \
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.10.0-5380/generic/go-server-17.10.0-5380.zip" > /tmp/go-server.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.11.0-5520/generic/go-server-17.11.0-5520.zip" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.10.0 /go-server && \
-# ensure that logs are printed to console output
-  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-server/config/log4j.properties && \
-  echo "" >> /go-server/config/log4j.properties && \
-  echo "" >> /go-server/config/log4j.properties && \
-  echo "# Log to stdout" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-server/config/log4j.properties && \
-  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-server/config/log4j.properties
+  mv go-server-17.11.0 /go-server
+
+COPY logback-include.xml /go-server/config/logback-include.xml
 
 ADD docker-entrypoint.sh /
 
