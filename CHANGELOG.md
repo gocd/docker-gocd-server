@@ -1,3 +1,8 @@
+# Docker GoCD Server 17.11.0
+
+* [6722950](https://github.com/gocd/docker-gocd-server/commit/67229502db6b38d08de837bde320107a659b7ea7) - Move to using logback
+* [0736c74](https://github.com/gocd/docker-gocd-server/commit/0736c74da43baab6cdae23c5e6db19489cfa4b5e) - Export $SERVER_WORK_DIR and $GO_CONFIG_DIR only when starting the server when starting the container.
+
 # Docker GoCD Server 17.10.0
 
 * [90d8bc8](https://github.com/gocd/docker-gocd-server/commit/90d8bc8d9abef7198351fb4a7c35f88bde386ebe) Allow users to specify `uid` and `gid` as build args while building a docker image.
