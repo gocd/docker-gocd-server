@@ -44,7 +44,8 @@ RUN \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-17.11.0 /go-server
+  mv go-server-17.11.0 /go-server \
+  mkdir -p /docker-entrypoint.d
 
 COPY logback-include.xml /go-server/config/logback-include.xml
 
