@@ -50,5 +50,6 @@ RUN \
 COPY logback-include.xml /go-server/config/logback-include.xml
 
 ADD docker-entrypoint.sh /
+ADD install_plugins.sh /docker-entrypoint.d/install_plugins.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
