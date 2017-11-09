@@ -43,6 +43,18 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-se
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
 
+## Running custom entrypoint scripts
+
+To execute custom scripts during the container boostrap, but **before** the gocd server starts just do
+
+add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ` so
+
+```
+docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh -v /path/to/home-dir:/home/go gocd/gocd-server:v17.11.0
+```
+
+Be sure your script is executable - you can add as many scripts as you like
+ 
 ## Installing plugins
 
 All plugins can be installed under `/godata`.

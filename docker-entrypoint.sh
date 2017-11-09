@@ -74,4 +74,14 @@ fi
 
 # these 3 vars are used by `/go-server/server.sh`, so we export
 export GO_SERVER_SYSTEM_PROPERTIES="${GO_SERVER_SYSTEM_PROPERTIES}${GO_SERVER_SYSTEM_PROPERTIES:+ }-Dgo.console.stdout=true"
+
+echo "Running custom scripts..."
+for f in /docker-entrypoint.d/*; do
+  case "$f" in
+    *.sh)     echo "$0: running $f"; . "$f" ;;
+    *)        echo "$0: ignoring $f" ;;
+  esac
+  echo
+done
+
 try exec "$@"
