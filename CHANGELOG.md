@@ -1,3 +1,7 @@
+# Unreleased
+
+* [#46](https://github.com/gocd/docker-gocd-server/issues/46) - add support for custom entry-point scripts on startup. Any executables volume mounted in `/docker-entrypoint.d` will be executed before starting the GoCD server. This will allow users to perform initialization when runing the container, or building images that derive from the `gocd/gocd-server`
+
 # Docker GoCD Server 17.11.0
 
 * [6722950](https://github.com/gocd/docker-gocd-server/commit/67229502db6b38d08de837bde320107a659b7ea7) - Move to using logback
