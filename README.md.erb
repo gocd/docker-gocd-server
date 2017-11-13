@@ -15,6 +15,7 @@ docker pull gocd/gocd-server:v<%= gocd_version %>
 Build one with version `<%= gocd_version %>`; zip file is from GoCD [`download`][0] webpage.
 ```bash
 GOCD_VERSION=<%= gocd_version %> \
+GOCD_FULL_VERSION=<%= gocd_full_version %>
 GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/<%= gocd_full_version %>/generic/go-server-<%= gocd_full_version %>.zip \
 rake build_image
 ```
