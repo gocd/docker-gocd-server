@@ -43,15 +43,32 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-se
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
 
+## Running custom entrypoint scripts
+
+To execute custom scripts during the container boostrap, but **before** the gocd server starts just do
+
+add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ` so
+
+```
+docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh -v /path/to/home-dir:/home/go gocd/gocd-server:v17.11.0
+```
+
+Be sure your script is executable - you can add as many scripts as you like
+ 
 ## Installing plugins
 
-All plugins can be installed under `/godata`.
+To install plugins, just add an ENV variable with the prefix `GOCD_PLUING_INSTALL_` and your name as `suffix`
+and the value being the download URL. The plugin will only be downloaded if not yet present.
+
+An example example would be `GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar`
+
+And as part of the docker command
 
 ```
-mkdir -p /path/to/godata/plugins/external
-curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/external/plugin.jar
-chown -R 1000 /path/to/godata/plugins
+docker run -e GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar -v /path/to/home-dir:/home/go gocd/gocd-server:v17.11.0
 ```
+
+You can have several plugins installed, just be sure that the `suffix` is unique
 
 ## Installing addons
 

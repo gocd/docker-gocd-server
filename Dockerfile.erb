@@ -44,10 +44,12 @@ RUN \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-<%= gocd_version %> /go-server
+  mv go-server-<%= gocd_version %> /go-server && \
+  mkdir -p /docker-entrypoint.d
 
 COPY logback-include.xml /go-server/config/logback-include.xml
 
 ADD docker-entrypoint.sh /
+ADD install_plugins.sh /docker-entrypoint.d/install_plugins.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
