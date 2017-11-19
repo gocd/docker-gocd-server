@@ -68,6 +68,8 @@ if [ "$1" = '/go-server/server.sh' ]; then
       try chown go:go "${VOLUME_DIR}/config/logback-include.xml"
     fi
 
+    try install-gocd-plugins
+
     yell "Running custom scripts in /docker-entrypoint.d/ ..."
 
     # to prevent expansion to literal string `/docker-entrypoint.d/*` when there is nothing matching the glob
