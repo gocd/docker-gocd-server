@@ -63,10 +63,25 @@ if [ "$1" = '/go-server/server.sh' ]; then
       fi
     done
 
-     if [ ! -e "${SERVER_WORK_DIR}/config/logback-include.xml" ]; then
+    if [ ! -e "${SERVER_WORK_DIR}/config/logback-include.xml" ]; then
       try cp -rfv "/go-server/config/logback-include.xml" "${SERVER_WORK_DIR}/config/logback-include.xml"
       try chown go:go "${VOLUME_DIR}/config/logback-include.xml"
     fi
+
+    try install-gocd-plugins
+
+    yell "Running custom scripts in /docker-entrypoint.d/ ..."
+
+    # to prevent expansion to literal string `/docker-entrypoint.d/*` when there is nothing matching the glob
+    shopt -s nullglob
+
+    for file in /docker-entrypoint.d/*; do
+      if [ -f "$file" ] && [ -x "$file" ]; then
+        try "$file"
+      else
+        yell "Ignoring $file, it is either not a file or is not executable"
+      fi
+    done
 
     try exec /sbin/tini -- su-exec go "$0" "$@"
   fi
@@ -74,4 +89,5 @@ fi
 
 # these 3 vars are used by `/go-server/server.sh`, so we export
 export GO_SERVER_SYSTEM_PROPERTIES="${GO_SERVER_SYSTEM_PROPERTIES}${GO_SERVER_SYSTEM_PROPERTIES:+ }-Dgo.console.stdout=true"
+
 try exec "$@"
