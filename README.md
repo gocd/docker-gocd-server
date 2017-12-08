@@ -3,27 +3,33 @@
 An Alpine Linux based docker image for [GoCD server](https://www.gocd.org).
 
 # Docker Image
+
 *You could either download the latest built image from docker hub or build one
 locally with the zip file from GoCD Download webpage.*
 
 ## 1.1 Download the latest Image
-```bash
-docker pull gocd/gocd-server:v17.11.0
+
+```shell
+docker pull gocd/gocd-server:v17.12.0
 ```
 
 ## 1.2 Build One Locally
-Build one with version `17.11.0`; zip file is from GoCD [`download`][0] webpage.
-```bash
-GOCD_VERSION=17.11.0 \
-GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/17.11.0-5520/generic/go-server-17.11.0-5520.zip \
+
+Build one with version `17.12.0`; zip file is from GoCD [`download`][0] webpage.
+
+```shell
+GOCD_VERSION=17.12.0 \
+GOCD_FULL_VERSION=17.12.0-5626
+GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/17.12.0-5626/generic/go-server-17.12.0-5626.zip \
 rake build_image
 ```
 
 # Usage
+
 Start the container with this:
 
-```bash
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v17.11.0
+```shell
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v17.12.0
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server.
@@ -37,8 +43,8 @@ The GoCD server will store all configuration, pipeline history database,
 artifacts, plugins, and logs into `/godata`. If you'd like to provide secure
 credentials like SSH private keys among other things, you can mount `/home/go`
 
-```bash
-docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v17.11.0
+```shell
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v17.12.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
@@ -47,11 +53,51 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-se
 
 All plugins can be installed under `/godata`.
 
+### Installing plugins using an environment configuration
+
+To install plugins, just add an ENV variable with the prefix `GOCD_PLUGIN_INSTALL_` and your name as `suffix`
+and the value being the download URL. The plugin will only be downloaded if not yet present.
+
+An example example would be `GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar`:
+
+```shell
+docker run \
+  -e GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar \
+  gocd/gocd-server:v17.12.0
 ```
-mkdir -p /path/to/godata/plugins/external
+
+To install multiple plugins, add several `-e` arguments as such:
+
+```shell
+docker run \
+  -e GOCD_PLUGIN_INSTALL_a-plugin=https://example.com/a-plugin.jar \
+  -e GOCD_PLUGIN_INSTALL_b-plugin=https://example.com/b-plugin.jar \
+  gocd/gocd-server:v17.12.0
+```
+
+### Installing plugins using a custom entry-point script (see below)
+
+```shell
+mkdir -p /godata/plugins/external
 curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/external/plugin.jar
-chown -R 1000 /path/to/godata/plugins
+chown -R 1000 /godata/plugins/external
 ```
+
+## Running custom entrypoint scripts
+
+To execute custom script(s) during the container boostrap, but **before** the GoCD server starts just add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh` like so:
+
+```shell
+docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ... gocd/gocd-server:v17.12.0
+```
+
+If you have several scripts in a directory that you'd like to execute:
+
+```shell
+docker run -v /path/to/script-dir:/docker-entrypoint.d ... gocd/gocd-server:v17.12.0
+```
+
+> **Note:** Ensure that your scripts are executable `chmod a+x` — you can add as many scripts as you like, `bash` is available on the container. If your script uses other scripting language (perl, python), please ensure that the scripting language is installed in the container.
 
 ## Installing addons
 
@@ -67,8 +113,8 @@ chown -R 1000 /path/to/godata/addons
 
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
 
-```bash
-docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v17.11.0
+```shell
+docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v17.12.0
 ```
 
 # Under the hood
@@ -90,12 +136,12 @@ The GoCD server runs as the `go` user, the location of the various directories i
 Once the GoCD server is up, we should be able to determine its ip address and the ports mapped onto the host by doing the following:
 The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
 If you have started the container with
-```bash
-docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.11.0
+```shell
+docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v17.12.0
 ```
 
 Then, the below commands will determine to GoCD server IP, server port and ssl port
-```bash
+```shell
 docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' server
 docker inspect --format='{{(index (index .NetworkSettings.Ports "8153/tcp") 0).HostPort}}' server
 docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' server
