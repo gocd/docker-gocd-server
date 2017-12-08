@@ -16,6 +16,14 @@ FROM alpine:3.6
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
+# Important: this values are yet read only, you cannot and should not change them, rather use them in your scripts
+ENV GOCD_DATA_HOME=/godata
+ENV GOCD_DB_HOME=/godata/db
+ENV GOCD_ADDONS_HOME=/godata/addons
+ENV GOCD_PLUGIN_HOME=/godata/plugins
+ENV GOCD_PLUGIN_EXTERNAL_HOME=/godata/plugins/external
+ENV GOCD_ARTIFACTS_HOME=/godata/artifacts
+
 LABEL gocd.version="<%= gocd_version %>" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
