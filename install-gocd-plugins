@@ -11,8 +11,8 @@ if [ ! -e "${GOCD_PLUGIN_EXTERNAL_HOME}" ]; then
   try chown go:go "${GOCD_PLUGIN_EXTERNAL_HOME}"
 fi
 
-while IFS='=' read -r name value ; do
-  if [[ $name == "GOCD_PLUGIN_INSTALL_"* ]]; then
+(while IFS='=' read -r name value ; do
+  if [[ "${name}" == "GOCD_PLUGIN_INSTALL_"* ]]; then
     plugin_url="${value}"
 
     # remove the `GOCD_PLUGIN_INSTALL_` prefix and grab the plugin name
@@ -27,4 +27,4 @@ while IFS='=' read -r name value ; do
       yell "Skipping installation of ${plugin_name} as it appears to be installed"
     fi
   fi
-done < <(env)
+done) < <(env)
