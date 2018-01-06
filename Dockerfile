@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.6
+FROM alpine:3.7
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
@@ -20,7 +20,7 @@ LABEL gocd.version="17.12.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
   gocd.full.version="17.12.0-5626" \
-  gocd.git.sha="cb7df2ffe421e43f2a682a7a323cb3a3e30734cc"
+  gocd.git.sha="left"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -49,6 +49,7 @@ RUN \
 
 COPY logback-include.xml /go-server/config/logback-include.xml
 COPY install-gocd-plugins /usr/local/sbin/install-gocd-plugins
+COPY git-clone-config /usr/local/sbin/git-clone-config
 
 ADD docker-entrypoint.sh /
 
