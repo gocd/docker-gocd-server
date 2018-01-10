@@ -20,7 +20,7 @@ LABEL gocd.version="17.12.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
   gocd.full.version="17.12.0-5626" \
-  gocd.git.sha="left"
+  gocd.git.sha="cb7df2ffe421e43f2a682a7a323cb3a3e30734cc"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
