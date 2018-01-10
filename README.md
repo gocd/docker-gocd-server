@@ -71,6 +71,7 @@ To install multiple plugins, add several `-e` arguments as such:
 ```shell
 docker run \
   -e GOCD_PLUGIN_INSTALL_a-plugin=https://example.com/a-plugin.jar \
+  -e GOCD_PLUGIN_INSTALL_b-plugin=https://example.com/b-plugin.jar \
   gocd/gocd-server:v17.12.0
 ```
 
