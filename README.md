@@ -71,7 +71,17 @@ To install multiple plugins, add several `-e` arguments as such:
 ```shell
 docker run \
   -e GOCD_PLUGIN_INSTALL_a-plugin=https://example.com/a-plugin.jar \
-  -e GOCD_PLUGIN_INSTALL_b-plugin=https://example.com/b-plugin.jar \
+  gocd/gocd-server:v17.12.0
+```
+
+### Loading configuration from existing git repo
+To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`. Auth token may be used to access private repo. Branch 'master' would be cloned by default. To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`.  
+Cloned repo **must** contain all files from `/godata/config` dir.
+
+```shell
+docker run \
+  -e CONFIG_GIT_REPO=https://gocd_user:f6b17f4e20504b381278d6b0bdeaba8a8f093@mygitlab/stCarolas/config.git \
+  -e CONFIG_GIT_BRANCH=branch_with_config \
   gocd/gocd-server:v17.12.0
 ```
 

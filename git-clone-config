@@ -5,7 +5,7 @@ die() { yell "$*"; exit 111; }
 try() { echo "$ $@" 1>&2; "$@" || die "cannot $*"; }
 
 if [ ! -z "$CONFIG_GIT_REPO" ]; then 
-  BRANCH=${CONFIG_GIT_BRANCH}
+  BRANCH=$CONFIG_GIT_BRANCH
   if [ -z "$BRANCH" ]; then 
     BRANCH="master"
   fi
