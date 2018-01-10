@@ -74,8 +74,16 @@ docker run \
   gocd/gocd-server:v17.12.0
 ```
 
-### Loading configuration from existing git repo
-To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`. Auth token may be used to access private repo. Branch 'master' would be cloned by default. To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`.  
+### Installing plugins using a custom entry-point script (see below)
+
+```shell
+mkdir -p /godata/plugins/external
+curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/external/plugin.jar
+chown -R 1000 /godata/plugins/external
+```
+
+## Loading configuration from existing git repo
+To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`. Auth token may be used to access private repo. Branch `master` would be cloned by default. To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`.  
 Cloned repo **must** contain all files from `/godata/config` dir.
 
 ```shell
@@ -85,13 +93,6 @@ docker run \
   gocd/gocd-server:v17.12.0
 ```
 
-### Installing plugins using a custom entry-point script (see below)
-
-```shell
-mkdir -p /godata/plugins/external
-curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/external/plugin.jar
-chown -R 1000 /godata/plugins/external
-```
 
 ## Running custom entrypoint scripts
 
