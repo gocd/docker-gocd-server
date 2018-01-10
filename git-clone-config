@@ -11,4 +11,5 @@ if [ ! -z "$CONFIG_GIT_REPO" ]; then
   fi
   try rm -rf /godata/config
   try git clone -b $BRANCH $CONFIG_GIT_REPO /godata/config
+  chown -R go:go /godata/config
 fi
