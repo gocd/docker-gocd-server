@@ -89,10 +89,11 @@ Cloned repo **must** contain all files from `/godata/config` dir.
 
 ```shell
 docker run \
-  -e CONFIG_GIT_REPO=https://gocd_user:f6b17f4e20504b381278d6b0bdeaba8a8f093@mygitlab/stCarolas/config.git \
+  -e CONFIG_GIT_REPO=https://gocd_user:<password_or_auth_token>/config.git \
   -e CONFIG_GIT_BRANCH=branch_with_config \
   gocd/gocd-server:v17.12.0
 ```
+*Checkouted content would overwrite files in `/godata/config/`*
 
 
 ## Running custom entrypoint scripts
