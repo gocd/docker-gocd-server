@@ -83,6 +83,22 @@ curl --location --fail https://example.com/plugin.jar > /path/to/godata/plugins/
 chown -R 1000 /godata/plugins/external
 ```
 
+## Loading configuration from existing git repo
+To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`. 
+Auth token may be used to access private repo. Branch `master` would be cloned by default. 
+To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`. 
+If `/godata/config` already is git repo then CONFIG_GIT_REPO will be ignored. 
+Cloned repo **must** contain all files from `/godata/config` dir.
+
+```shell
+docker run \
+  -e CONFIG_GIT_REPO=https://gocd_user:<password_or_auth_token>/config.git \
+  -e CONFIG_GIT_BRANCH=branch_with_config \
+  gocd/gocd-server:v17.12.0
+```
+*Checkouted content would overwrite files in `/godata/config/`*.
+
+
 ## Running custom entrypoint scripts
 
 To execute custom script(s) during the container boostrap, but **before** the GoCD server starts just add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh` like so:

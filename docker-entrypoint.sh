@@ -69,6 +69,7 @@ if [ "$1" = '/go-server/server.sh' ]; then
     fi
 
     try install-gocd-plugins
+    try git-clone-config
 
     yell "Running custom scripts in /docker-entrypoint.d/ ..."
 
