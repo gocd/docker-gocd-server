@@ -49,7 +49,6 @@ RUN \
 
 COPY logback-include.xml /go-server/config/logback-include.xml
 COPY install-gocd-plugins /usr/local/sbin/install-gocd-plugins
-COPY git-clone-config /usr/local/sbin/git-clone-config
 
 ADD docker-entrypoint.sh /
 
