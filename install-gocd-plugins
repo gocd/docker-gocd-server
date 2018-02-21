@@ -20,11 +20,11 @@ fi
     # the file where the plugin jar will be written out to
     plugin_dest="${GOCD_PLUGIN_EXTERNAL_HOME}/${plugin_name}.jar"
 
-    if [ ! -e "${plugin_dest}" ]; then
-      try curl --silent --location --fail --retry 3 "${plugin_url}" --output "${plugin_dest}"
-      try chown go:go "${plugin_dest}"
-    else
-      yell "Skipping installation of ${plugin_name} as it appears to be installed"
+    if [ -e "${plugin_dest}" ]; then
+      yell "Overwriting the plugin '$plugin_dest' with new jar."
+      try rm "${plugin_dest}"
     fi
+    try curl --silent --location --fail --retry 3 "${plugin_url}" --output "${plugin_dest}"
+    try chown go:go "${plugin_dest}"
   fi
 done) < <(env)
