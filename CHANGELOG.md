@@ -1,3 +1,8 @@
+# Docker GoCD Server 18.2.0
+
+* [0bfabbf](https://github.com/gocd/docker-gocd-server/commit/0bfabbfb073a01d9cf8b3811165e336e0f2be37b) - Add script for cloning the gocd config on startup
+* [d375bab](https://github.com/gocd/docker-gocd-server/commit/d375babfd8de5ab5f19b895fa84e29f330a62830) - Always download the plugin jar and overwrite the plugins in the volume if present.
+
 # Docker GoCD Server 18.1.0
 
 No changes
