@@ -24,6 +24,18 @@ GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/<%= gocd_full_versio
 rake build_image
 ```
 
+### Build an image locally with different UID and GID for go user
+
+By default, the UID and GID of the `go` user in the docker container is `1000`. This can be overidden at the time of building the image with 
+
+```shell
+GOCD_VERSION=<%= gocd_version %> \
+GOCD_FULL_VERSION=<%= gocd_full_version %>
+GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/<%= gocd_full_version %>/generic/go-server-<%= gocd_full_version %>.zip \
+rake create_dockerfile
+docker build --build-arg UID=2000 --build-arg GID=2000 -t gocd-server-image:tag .
+```
+
 # Usage
 
 Start the container with this:
