@@ -16,11 +16,11 @@ FROM alpine:3.7
 
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="18.2.0" \
+LABEL gocd.version="18.3.0" \
   description="GoCD server based on alpine linux" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="18.2.0-6228" \
-  gocd.git.sha="fbb379a451871b29aa47aef907a78dc64379233f"
+  gocd.full.version="18.3.0-6540" \
+  gocd.git.sha="1e79bb6dc4f01f6ccd71c2b5aa0fbefa0b3eb92d"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -40,11 +40,11 @@ RUN \
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.2.0-6228/generic/go-server-18.2.0-6228.zip" > /tmp/go-server.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.3.0-6540/generic/go-server-18.3.0-6540.zip" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
   unzip /tmp/go-server.zip -d / && \
   rm /tmp/go-server.zip && \
-  mv go-server-18.2.0 /go-server && \
+  mv go-server-18.3.0 /go-server && \
   mkdir -p /docker-entrypoint.d
 
 COPY logback-include.xml /go-server/config/logback-include.xml
