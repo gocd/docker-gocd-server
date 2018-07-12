@@ -33,7 +33,6 @@ if [ "$1" = '/go-server/server.sh' ]; then
   if [ "$(id -u)" = '0' ]; then
     export SERVER_WORK_DIR="/go-working-dir"
     export GO_CONFIG_DIR="/go-working-dir/config"
-    export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
 
     server_dirs=(artifacts config db logs plugins addons)
 
