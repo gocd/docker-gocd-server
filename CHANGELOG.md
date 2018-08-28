@@ -1,3 +1,7 @@
+# Docker GoCD server 18.8.0
+
+* use alpine 3.8 image
+
 # Docker GoCD Server 18.2.0
 
 * [0bfabbf](https://github.com/gocd/docker-gocd-server/commit/0bfabbfb073a01d9cf8b3811165e336e0f2be37b) - Add script for cloning the gocd config on startup
