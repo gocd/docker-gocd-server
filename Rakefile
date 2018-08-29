@@ -1,17 +1,22 @@
 require 'erb'
+require 'json'
 
-def get_var(name)
-  if ENV[name].to_s.strip.empty?
-    raise "environment #{name} not specified!"
-  else
-    ENV[name]
-  end
+def versionFile(name)
+  version_file_location = ENV["VERSION_FILE_LOCATION"] || 'version.json'
+  JSON.parse(File.read(version_file_location))[name] if File.file?(version_file_location)
 end
 
-gocd_version = get_var('GOCD_VERSION')
-download_url = get_var('GOCD_SERVER_DOWNLOAD_URL')
-gocd_full_version = get_var('GOCD_FULL_VERSION')
-gocd_git_sha = get_var('GOCD_GIT_SHA')
+def get_var(name)
+  value = ENV[name]
+  raise "Environment #{name} not specified!" if value.to_s.strip.empty?
+  value
+end
+
+gocd_full_version = versionFile('go_full_version') || get_var('GOCD_FULL_VERSION')
+gocd_version = versionFile('go_version') || get_var('GOCD_VERSION')
+gocd_git_sha = versionFile('git_sha') || get_var('GOCD_GIT_SHA')
+
+download_url = ENV['GOCD_SERVER_DOWNLOAD_URL'] || "https://download.gocd.org/experimental/binaries/#{gocd_full_version}/generic/go-server-#{gocd_full_version}.zip"
 
 tag = ENV['TAG']
 
