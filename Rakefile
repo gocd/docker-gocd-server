@@ -12,6 +12,17 @@ def get_var(name)
   value
 end
 
+class Docker
+  def self.login
+    token = ENV["TOKEN"]
+    raise "Environment variable TOKEN is not specified." unless token
+    FileUtils.mkdir_p "#{Dir.home}/.docker"
+    File.open("#{Dir.home}/.docker/config.json", "w") do |f|
+      f.write({:auths => {"https://index.docker.io/v1/" => {:auth => token}}}.to_json)
+    end
+  end
+end
+
 gocd_full_version = versionFile('go_full_version') || get_var('GOCD_FULL_VERSION')
 gocd_version = versionFile('go_version') || get_var('GOCD_VERSION')
 gocd_git_sha = versionFile('git_sha') || get_var('GOCD_GIT_SHA')
@@ -19,6 +30,9 @@ gocd_git_sha = versionFile('git_sha') || get_var('GOCD_GIT_SHA')
 download_url = ENV['GOCD_SERVER_DOWNLOAD_URL'] || "https://download.gocd.org/experimental/binaries/#{gocd_full_version}/generic/go-server-#{gocd_full_version}.zip"
 
 tag = ENV['TAG']
+
+# Perform docker login if token is specified or error out
+Docker.login
 
 task :create_dockerfile do
   template = File.read('Dockerfile.erb')
