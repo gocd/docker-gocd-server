@@ -61,6 +61,12 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-se
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
 
+Mounting volumes is also useful in upgrading GoCD instance. For instance, one can attach the latest image to the existing mount volumes to upgrade their instance.
+
+```shell
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:latest_version #e.g. v18.9.0
+```
+
 ## Installing plugins
 
 All plugins can be installed under `/godata`.
