@@ -19,7 +19,7 @@ Build one with version `<%= gocd_version %>`; zip file is from GoCD [`download`]
 
 ```shell
 GOCD_VERSION=<%= gocd_version %> \
-GOCD_FULL_VERSION=<%= gocd_full_version %>
+GOCD_FULL_VERSION=<%= gocd_full_version %> \
 GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/<%= gocd_full_version %>/generic/go-server-<%= gocd_full_version %>.zip \
 rake build_image
 ```
@@ -30,7 +30,7 @@ By default, the UID and GID of the `go` user in the docker container is `1000`. 
 
 ```shell
 GOCD_VERSION=<%= gocd_version %> \
-GOCD_FULL_VERSION=<%= gocd_full_version %>
+GOCD_FULL_VERSION=<%= gocd_full_version %> \
 GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/<%= gocd_full_version %>/generic/go-server-<%= gocd_full_version %>.zip \
 rake create_dockerfile
 docker build --build-arg UID=2000 --build-arg GID=2000 -t gocd-server-image:tag .

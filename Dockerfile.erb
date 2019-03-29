@@ -38,7 +38,7 @@ RUN \
   adduser -D -u ${UID} -s /bin/bash -G go go && \
 # install dependencies and other helpful CLI tools
   apk --no-cache upgrade && \
-  apk add --no-cache openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
+  apk add --no-cache nss openjdk8-jre-base git mercurial subversion tini openssh-client bash su-exec curl && \
 # download the zip file
   curl --fail --location --silent --show-error "<%= download_url %>" > /tmp/go-server.zip && \
 # unzip the zip file into /go-server, after stripping the first path prefix
