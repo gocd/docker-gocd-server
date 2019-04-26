@@ -1,47 +1,13 @@
 # GoCD Server Docker image
 
-An Alpine Linux based docker image for [GoCD server](https://www.gocd.org).
-
-# Docker Image
-
-*You could either download the latest built image from docker hub or build one
-locally with the zip file from GoCD Download webpage.*
-
-## 1.1 Download the latest Image
-
-```shell
-docker pull gocd/gocd-server:v19.2.0
-```
-
-## 1.2 Build One Locally
-
-Build one with version `19.2.0`; zip file is from GoCD [`download`][0] webpage.
-
-```shell
-GOCD_VERSION=19.2.0 \
-GOCD_FULL_VERSION=19.2.0-8641
-GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/19.2.0-8641/generic/go-server-19.2.0-8641.zip \
-rake build_image
-```
-
-### Build an image locally with different UID and GID for go user
-
-By default, the UID and GID of the `go` user in the docker container is `1000`. This can be overidden at the time of building the image with 
-
-```shell
-GOCD_VERSION=19.2.0 \
-GOCD_FULL_VERSION=19.2.0-8641
-GOCD_SERVER_DOWNLOAD_URL=https://download.gocd.org/binaries/19.2.0-8641/generic/go-server-19.2.0-8641.zip \
-rake create_dockerfile
-docker build --build-arg UID=2000 --build-arg GID=2000 -t gocd-server-image:tag .
-```
+An alpine based docker image for [GoCD server](https://www.gocd.org).
 
 # Usage
 
 Start the container with this:
 
 ```shell
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v19.2.0
+docker run -d -p8153:8153 -p8154:8154 gocd/docker-gocd-server:v19.3.0
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server.
@@ -56,10 +22,10 @@ artifacts, plugins, and logs into `/godata`. If you'd like to provide secure
 credentials like SSH private keys among other things, you can mount `/home/go`
 
 ```shell
-docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v19.2.0
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/docker-gocd-server:v19.3.0
 ```
 
-> **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
+> **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid `1000`).
 
 ## Installing plugins
 
@@ -75,7 +41,7 @@ An example example would be `GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://g
 ```shell
 docker run \
   -e GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar \
-  gocd/gocd-server:v19.2.0
+  gocd/docker-gocd-server:v19.3.0
 ```
 
 To install multiple plugins, add several `-e` arguments as such:
@@ -84,7 +50,7 @@ To install multiple plugins, add several `-e` arguments as such:
 docker run \
   -e GOCD_PLUGIN_INSTALL_a-plugin=https://example.com/a-plugin.jar \
   -e GOCD_PLUGIN_INSTALL_b-plugin=https://example.com/b-plugin.jar \
-  gocd/gocd-server:v19.2.0
+  gocd/docker-gocd-server:v19.3.0
 ```
 
 ### Installing plugins using a custom entry-point script (see below)
@@ -96,17 +62,17 @@ chown -R 1000 /godata/plugins/external
 ```
 
 ## Loading configuration from existing git repo
-To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`. 
-Auth token may be used to access private repo. Branch `master` would be cloned by default. 
-To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`. 
-If `/godata/config` already is git repo then CONFIG_GIT_REPO will be ignored. 
+To load existing configuration from git repo, just add an ENV variable `CONFIG_GIT_REPO`.
+Auth token may be used to access private repo. Branch `master` would be cloned by default.
+To load another branch, define an ENV variable `CONFIG_GIT_BRANCH`.
+If `/godata/config` already is git repo then CONFIG_GIT_REPO will be ignored.
 Cloned repo **must** contain all files from `/godata/config` dir.
 
 ```shell
 docker run \
   -e CONFIG_GIT_REPO=https://gocd_user:<password_or_auth_token>/config.git \
   -e CONFIG_GIT_BRANCH=branch_with_config \
-  gocd/gocd-server:v17.12.0
+  gocd/docker-gocd-server:v19.3.0
 ```
 *Checkouted content would overwrite files in `/godata/config/`*.
 
@@ -116,13 +82,13 @@ docker run \
 To execute custom script(s) during the container boostrap, but **before** the GoCD server starts just add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh` like so:
 
 ```shell
-docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ... gocd/gocd-server:v19.2.0
+docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ... gocd/docker-gocd-server:v19.3.0
 ```
 
 If you have several scripts in a directory that you'd like to execute:
 
 ```shell
-docker run -v /path/to/script-dir:/docker-entrypoint.d ... gocd/gocd-server:v19.2.0
+docker run -v /path/to/script-dir:/docker-entrypoint.d ... gocd/docker-gocd-server:v19.3.0
 ```
 
 > **Note:** Ensure that your scripts are executable `chmod a+x` — you can add as many scripts as you like, `bash` is available on the container. If your script uses other scripting language (perl, python), please ensure that the scripting language is installed in the container.
@@ -142,7 +108,7 @@ chown -R 1000 /path/to/godata/addons
 JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
 
 ```shell
-docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v19.2.0
+docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/docker-gocd-server:v19.3.0
 ```
 
 # Under the hood
@@ -165,7 +131,7 @@ Once the GoCD server is up, we should be able to determine its ip address and th
 The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
 If you have started the container with
 ```shell
-docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v19.2.0
+docker run --name server -it -p8153:8153 -p8154:8154 gocd/docker-gocd-server:v19.3.0
 ```
 
 Then, the below commands will determine to GoCD server IP, server port and ssl port
@@ -184,15 +150,10 @@ docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).H
 - Check the server logs `docker exec -it CONTAINER_ID tail -f /godata/logs/go-server.log` (or check the log file in the volume mount, if you're using one)
 
 
-# Bugs with Docker Server Image 17.3.0
-
-* Anyone using our docker image as the base image for your customized image, and writing to `/home/go` as part of your Dockerfile, these changes in `/home/go` don't persist while you start the container with your custom image.
- A fix has been applied [here](https://github.com/gocd/docker-gocd-server/commit/d49ffa4) and will be available for subsequent releases of the docker images.
-
 # License
 
 ```plain
-Copyright 2018 ThoughtWorks, Inc.
+Copyright 2019 ThoughtWorks, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -207,4 +168,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-[0]: https://www.gocd.io/download/
+[0]: https://www.gocd.org/download/
