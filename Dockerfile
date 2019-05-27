@@ -18,19 +18,22 @@
 ###############################################################################################
 
 FROM alpine:latest as gocd-server-unzip
-COPY go-server-19.3.0-8959.zip /tmp/go-server-19.3.0-8959.zip
-RUN unzip /tmp/go-server-19.3.0-8959.zip -d /
-RUN mv /go-server-19.3.0 /go-server
+RUN \
+  apk --no-cache upgrade && \
+  apk add --no-cache curl && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.4.0-9155/generic/go-server-19.4.0-9155.zip" > /tmp/go-server-19.4.0-9155.zip
+RUN unzip /tmp/go-server-19.4.0-9155.zip -d /
+RUN mv /go-server-19.4.0 /go-server
 
 FROM alpine:3.9
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.3.0" \
+LABEL gocd.version="19.4.0" \
   description="GoCD server based on alpine version 3.9" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.3.0-8959" \
-  gocd.git.sha="2c0a76ae7403804f7e0274d2e1976485555767f7"
+  gocd.full.version="19.4.0-9155" \
+  gocd.git.sha="0f01ab091e85a0d735b8b580eee5f83245fba2e5"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
