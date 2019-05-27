@@ -34,7 +34,7 @@ All plugins can be installed under `/godata`.
 ### Installing plugins using an environment configuration
 
 To install plugins, just add an ENV variable with the prefix `GOCD_PLUGIN_INSTALL_` and your name as `suffix`
-and the value being the download URL. The plugin will only be downloaded if not yet present.
+and the value being the download URL. The plugin will always be downloaded to ensure that latest specified verion is present on the volume.
 
 An example example would be `GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar`:
 
