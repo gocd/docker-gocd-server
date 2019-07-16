@@ -60,7 +60,7 @@ RUN \
   addgroup -g ${GID} go && \
   adduser -D -u ${UID} -s /bin/bash -G go go && \
   apk --no-cache upgrade && \
-  apk add --no-cache nss git mercurial subversion openssh-client bash curl && \
+  apk add --no-cache nss git mercurial subversion openssh-client bash curl cyrus-sasl cyrus-sasl-plain && \
   apk add --no-cache openjdk8-jre-base && \
   mkdir -p /docker-entrypoint.d
 
