@@ -21,55 +21,95 @@ FROM alpine:latest as gocd-server-unzip
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.5.0-9272/generic/go-server-19.5.0-9272.zip" > /tmp/go-server-19.5.0-9272.zip
-RUN unzip /tmp/go-server-19.5.0-9272.zip -d /
-RUN mv /go-server-19.5.0 /go-server
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.6.0-9515/generic/go-server-19.6.0-9515.zip" > /tmp/go-server-19.6.0-9515.zip
+RUN unzip /tmp/go-server-19.6.0-9515.zip -d /
+RUN mv /go-server-19.6.0 /go-server
 
 FROM alpine:3.9
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.5.0" \
+LABEL gocd.version="19.6.0" \
   description="GoCD server based on alpine version 3.9" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.5.0-9272" \
-  gocd.git.sha="496bf8b95e603c1f3980ae59042bc559eecbbbc0"
+  gocd.full.version="19.6.0-9515" \
+  gocd.git.sha="4b674c10941b6c27d7ec2a28dd946518d9211b7a"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
-ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/sbin/gosu
 
 # force encoding
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+ENV GO_JAVA_HOME="/gocd-jre"
 
 ARG UID=1000
-ARG GID=1000
 
 RUN \
 # add mode and permissions for files we added above
   chmod 0755 /usr/local/sbin/tini && \
   chown root:root /usr/local/sbin/tini && \
-  chmod 0755 /usr/local/sbin/gosu && \
-  chown root:root /usr/local/sbin/gosu && \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  addgroup -g ${GID} go && \
-  adduser -D -u ${UID} -s /bin/bash -G go go && \
+# add user to root group for gocd to work on openshift
+  adduser -D -u ${UID} -s /bin/bash -G root go && \
+  apk add --no-cache cyrus-sasl cyrus-sasl-plain && \
   apk --no-cache upgrade && \
-  apk add --no-cache nss git mercurial subversion openssh-client bash curl && \
-  apk add --no-cache openjdk8-jre-base && \
-  mkdir -p /docker-entrypoint.d
-
-COPY --from=gocd-server-unzip /go-server /go-server
-# ensure that logs are printed to console output
-COPY logback-include.xml /go-server/config/logback-include.xml
-COPY install-gocd-plugins /usr/local/sbin/install-gocd-plugins
-COPY git-clone-config /usr/local/sbin/git-clone-config
+  apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
+  # install glibc and zlib for adoptopenjdk && \
+  # See https://github.com/AdoptOpenJDK/openjdk-docker/blob/ce8b120411b131e283106ab89ea5921ebb1d1759/8/jdk/alpine/Dockerfile.hotspot.releases.slim#L24-L54 && \
+    apk add --no-cache --virtual .build-deps curl binutils && \
+    GLIBC_VER="2.29-r0" && \
+    ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+    GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-9.1.0-2-x86_64.pkg.tar.xz" && \
+    GCC_LIBS_SHA256=91dba90f3c20d32fcf7f1dbe91523653018aa0b8d2230b00f822f6722804cf08 && \
+    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.2.11-3-x86_64.pkg.tar.xz" && \
+    ZLIB_SHA256=17aede0b9f8baa789c5aa3f358fbf8c68a5f1228c5e6cba1a5dd34102ef4d4e5 && \
+    curl -LfsS https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub && \
+    SGERRAND_RSA_SHA256="823b54589c93b02497f1ba4dc622eaef9c813e6b0f0ebbb2f771e32adf9f4ef2" && \
+    echo "${SGERRAND_RSA_SHA256} */etc/apk/keys/sgerrand.rsa.pub" | sha256sum -c - && \
+    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-${GLIBC_VER}.apk > /tmp/glibc-${GLIBC_VER}.apk && \
+    apk add /tmp/glibc-${GLIBC_VER}.apk && \
+    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-bin-${GLIBC_VER}.apk > /tmp/glibc-bin-${GLIBC_VER}.apk && \
+    apk add /tmp/glibc-bin-${GLIBC_VER}.apk && \
+    curl -Ls ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-i18n-${GLIBC_VER}.apk > /tmp/glibc-i18n-${GLIBC_VER}.apk && \
+    apk add /tmp/glibc-i18n-${GLIBC_VER}.apk && \
+    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true && \
+    echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
+    curl -LfsS ${GCC_LIBS_URL} -o /tmp/gcc-libs.tar.xz && \
+    echo "${GCC_LIBS_SHA256} */tmp/gcc-libs.tar.xz" | sha256sum -c - && \
+    mkdir /tmp/gcc && \
+    tar -xf /tmp/gcc-libs.tar.xz -C /tmp/gcc && \
+    mv /tmp/gcc/usr/lib/libgcc* /tmp/gcc/usr/lib/libstdc++* /usr/glibc-compat/lib && \
+    strip /usr/glibc-compat/lib/libgcc_s.so.* /usr/glibc-compat/lib/libstdc++.so* && \
+    curl -LfsS ${ZLIB_URL} -o /tmp/libz.tar.xz && \
+    echo "${ZLIB_SHA256} */tmp/libz.tar.xz" | sha256sum -c - && \
+    mkdir /tmp/libz && \
+    tar -xf /tmp/libz.tar.xz -C /tmp/libz && \
+    mv /tmp/libz/usr/lib/libz.so* /usr/glibc-compat/lib && \
+    apk del --purge .build-deps glibc-i18n && \
+    rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
+  # end installing adoptopenjre  && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk12-binaries/releases/download/jdk-12.0.1%2B12/OpenJDK12U-jre_x64_linux_hotspot_12.0.1_12.tar.gz' --output /tmp/jre.tar.gz && \
+  mkdir -p /gocd-jre && \
+  tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
+  rm -rf /tmp/jre.tar.gz && \
+  mkdir -p /go-server /docker-entrypoint.d /go-working-dir /godata
 
 ADD docker-entrypoint.sh /
 
+COPY --from=gocd-server-unzip /go-server /go-server
+# ensure that logs are printed to console output
+COPY --chown=go:root logback-include.xml /go-server/config/logback-include.xml
+COPY --chown=go:root install-gocd-plugins /usr/local/sbin/install-gocd-plugins
+COPY --chown=go:root git-clone-config /usr/local/sbin/git-clone-config
+
+RUN chown -R go:root /go-server /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh \
+    && chmod -R g=u /go-server /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
+USER go

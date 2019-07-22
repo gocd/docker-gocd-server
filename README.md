@@ -2,12 +2,16 @@
 
 An alpine based docker image for [GoCD server](https://www.gocd.org).
 
+# Issues, feedback?
+
+Please make sure to log them at https://github.com/gocd/gocd.
+
 # Usage
 
 Start the container with this:
 
 ```shell
-docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v19.5.0
+docker run -d -p8153:8153 -p8154:8154 gocd/gocd-server:v19.6.0
 ```
 
 This will expose container ports 8153(http) and 8154(https) onto your server.
@@ -22,7 +26,7 @@ artifacts, plugins, and logs into `/godata`. If you'd like to provide secure
 credentials like SSH private keys among other things, you can mount `/home/go`
 
 ```shell
-docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v19.5.0
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-server:v19.6.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid `1000`).
@@ -41,7 +45,7 @@ An example example would be `GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://g
 ```shell
 docker run \
   -e GOCD_PLUGIN_INSTALL_docker-elastic-agents=https://github.com/gocd-contrib/docker-elastic-agents/releases/download/v0.8.0/docker-elastic-agents-0.8.0.jar \
-  gocd/gocd-server:v19.5.0
+  gocd/gocd-server:v19.6.0
 ```
 
 To install multiple plugins, add several `-e` arguments as such:
@@ -50,7 +54,7 @@ To install multiple plugins, add several `-e` arguments as such:
 docker run \
   -e GOCD_PLUGIN_INSTALL_a-plugin=https://example.com/a-plugin.jar \
   -e GOCD_PLUGIN_INSTALL_b-plugin=https://example.com/b-plugin.jar \
-  gocd/gocd-server:v19.5.0
+  gocd/gocd-server:v19.6.0
 ```
 
 ### Installing plugins using a custom entry-point script (see below)
@@ -72,7 +76,7 @@ Cloned repo **must** contain all files from `/godata/config` dir.
 docker run \
   -e CONFIG_GIT_REPO=https://gocd_user:<password_or_auth_token>/config.git \
   -e CONFIG_GIT_BRANCH=branch_with_config \
-  gocd/gocd-server:v19.5.0
+  gocd/gocd-server:v19.6.0
 ```
 *Checkouted content would overwrite files in `/godata/config/`*.
 
@@ -82,13 +86,13 @@ docker run \
 To execute custom script(s) during the container boostrap, but **before** the GoCD server starts just add `-v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh` like so:
 
 ```shell
-docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ... gocd/gocd-server:v19.5.0
+docker run -v /path/to/your/script.sh:/docker-entrypoint.d/your-script.sh ... gocd/gocd-server:v19.6.0
 ```
 
 If you have several scripts in a directory that you'd like to execute:
 
 ```shell
-docker run -v /path/to/script-dir:/docker-entrypoint.d ... gocd/gocd-server:v19.5.0
+docker run -v /path/to/script-dir:/docker-entrypoint.d ... gocd/gocd-server:v19.6.0
 ```
 
 > **Note:** Ensure that your scripts are executable `chmod a+x` — you can add as many scripts as you like, `bash` is available on the container. If your script uses other scripting language (perl, python), please ensure that the scripting language is installed in the container.
@@ -105,10 +109,10 @@ chown -R 1000 /path/to/godata/addons
 
 ## Tweaking JVM options (memory, heap etc)
 
-JVM options can be tweaked using the environment variable `GO_SERVER_SYSTEM_PROPERTIES`.
+JVM options can be tweaked using the environment variable `GOCD_SERVER_JVM_OPTS`.
 
 ```shell
-docker run -e GO_SERVER_SYSTEM_PROPERTIES="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v19.5.0
+docker run -e GOCD_SERVER_JVM_OPTS="-Xmx4096mb -Dfoo=bar" gocd/gocd-server:v19.6.0
 ```
 
 # Under the hood
@@ -131,7 +135,7 @@ Once the GoCD server is up, we should be able to determine its ip address and th
 The IP address and ports of the GoCD server in a docker container are important to know as they will be used by the GoCD agents to connect to it.
 If you have started the container with
 ```shell
-docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v19.5.0
+docker run --name server -it -p8153:8153 -p8154:8154 gocd/gocd-server:v19.6.0
 ```
 
 Then, the below commands will determine to GoCD server IP, server port and ssl port
@@ -140,6 +144,10 @@ docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' server
 docker inspect --format='{{(index (index .NetworkSettings.Ports "8153/tcp") 0).HostPort}}' server
 docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' server
 ```
+
+# Running GoCD Containers as Non Root
+
+With release `v19.6.0`, GoCD containers will run as non-root user, by default. The Dockerized GoCD application will run with user `go` (uid: `1000`) and group `root` (gid: `0`) instead of running as user `root` (uid: `0`) and group `root` (gid: `0`). For more information, checkout [Running Dockerized GoCD Containers as Non Root](https://www.gocd.org/2019/06/25/GoCD-non-root-containers/) blog post.
 
 # Troubleshooting
 
