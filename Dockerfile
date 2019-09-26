@@ -22,19 +22,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.8.0-9915/generic/go-server-19.8.0-9915.zip" > /tmp/go-server-19.8.0-9915.zip
-RUN unzip /tmp/go-server-19.8.0-9915.zip -d /
-RUN mv /go-server-19.8.0 /go-server && chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.9.0-10194/generic/go-server-19.9.0-10194.zip" > /tmp/go-server-19.9.0-10194.zip
+RUN unzip /tmp/go-server-19.9.0-10194.zip -d /
+RUN mv /go-server-19.9.0 /go-server && chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.9
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.8.0" \
+LABEL gocd.version="19.9.0" \
   description="GoCD server based on alpine version 3.9" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.8.0-9915" \
-  gocd.git.sha="9ea99a72c338a132ae1ca83f363e16b2c95d920b"
+  gocd.full.version="19.9.0-10194" \
+  gocd.git.sha="34fca8f7682a65ef5fbd6726d51fd52b0c041bc6"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
