@@ -22,19 +22,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.10.0-10357/generic/go-server-19.10.0-10357.zip" > /tmp/go-server-19.10.0-10357.zip
-RUN unzip /tmp/go-server-19.10.0-10357.zip -d /
-RUN mv /go-server-19.10.0 /go-server && chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.11.0-10687/generic/go-server-19.11.0-10687.zip" > /tmp/go-server-19.11.0-10687.zip
+RUN unzip /tmp/go-server-19.11.0-10687.zip -d /
+RUN mv /go-server-19.11.0 /go-server && chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.9
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.10.0" \
+LABEL gocd.version="19.11.0" \
   description="GoCD server based on alpine version 3.9" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.10.0-10357" \
-  gocd.git.sha="44d61cc733a94287979f1fb99583d69139f386e4"
+  gocd.full.version="19.11.0-10687" \
+  gocd.git.sha="c532a61bb240ffbe59fe356445bea6433005563f"
 
 # the ports that go server runs on
 EXPOSE 8153 8154
@@ -94,7 +94,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13%2B33/OpenJDK13U-jre_x64_linux_hotspot_13_33.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.1%2B9/OpenJDK13U-jre_x64_linux_hotspot_13.0.1_9.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
