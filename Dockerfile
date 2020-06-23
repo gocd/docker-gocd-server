@@ -22,19 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.4.0-11749/generic/go-server-20.4.0-11749.zip" > /tmp/go-server-20.4.0-11749.zip
-RUN unzip /tmp/go-server-20.4.0-11749.zip -d /
-RUN mv /go-server-20.4.0 /go-server && chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.5.0-11820/generic/go-server-20.5.0-11820.zip" > /tmp/go-server-20.5.0-11820.zip
+RUN unzip /tmp/go-server-20.5.0-11820.zip -d /
+RUN mkdir -p /go-server/wrapper /go-server/bin && \
+    mv /go-server-20.5.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-20.5.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-20.5.0/lib /go-server/lib && \
+    mv /go-server-20.5.0/logs /go-server/logs && \
+    mv /go-server-20.5.0/run /go-server/run && \
+    mv /go-server-20.5.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-20.5.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.5.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.5.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.11
-MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="20.4.0" \
+LABEL gocd.version="20.5.0" \
   description="GoCD server based on alpine version 3.11" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.4.0-11749" \
-  gocd.git.sha="5553066d29d315951efa5ead0c087374df6338b9"
+  gocd.full.version="20.5.0-11820" \
+  gocd.git.sha="1c9b12ac8aa216a2c062fbec4cba18d9cfb8b404"
 
 # the ports that go server runs on
 EXPOSE 8153
@@ -42,9 +51,7 @@ EXPOSE 8153
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
 # force encoding
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 ENV GO_JAVA_HOME="/gocd-jre"
 
 ARG UID=1000
@@ -62,7 +69,7 @@ RUN \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
   # install glibc and zlib for adoptopenjdk && \
   # See https://github.com/AdoptOpenJDK/openjdk-docker/blob/ce8b120411b131e283106ab89ea5921ebb1d1759/8/jdk/alpine/Dockerfile.hotspot.releases.slim#L24-L54 && \
-    apk add --no-cache --virtual .build-deps curl binutils && \
+    apk add --no-cache --virtual .build-deps binutils && \
     GLIBC_VER="2.29-r0" && \
     ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
     GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-9.1.0-2-x86_64.pkg.tar.xz" && \
@@ -105,8 +112,7 @@ ADD docker-entrypoint.sh /
 COPY --from=gocd-server-unzip /go-server /go-server
 # ensure that logs are printed to console output
 COPY --chown=go:root logback-include.xml /go-server/config/logback-include.xml
-COPY --chown=go:root install-gocd-plugins /usr/local/sbin/install-gocd-plugins
-COPY --chown=go:root git-clone-config /usr/local/sbin/git-clone-config
+COPY --chown=go:root install-gocd-plugins git-clone-config /usr/local/sbin/
 
 RUN chown -R go:root /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh \
     && chmod -R g=u /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh
