@@ -22,28 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.6.0-12005/generic/go-server-20.6.0-12005.zip" > /tmp/go-server-20.6.0-12005.zip
-RUN unzip /tmp/go-server-20.6.0-12005.zip -d /
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.7.0-12097/generic/go-server-20.7.0-12097.zip" > /tmp/go-server-20.7.0-12097.zip
+RUN unzip /tmp/go-server-20.7.0-12097.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-20.6.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-20.6.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-20.6.0/lib /go-server/lib && \
-    mv /go-server-20.6.0/logs /go-server/logs && \
-    mv /go-server-20.6.0/run /go-server/run && \
-    mv /go-server-20.6.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-20.6.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.6.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.6.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-20.7.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-20.7.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-20.7.0/lib /go-server/lib && \
+    mv /go-server-20.7.0/logs /go-server/logs && \
+    mv /go-server-20.7.0/run /go-server/run && \
+    mv /go-server-20.7.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-20.7.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.7.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.7.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.11
 
-LABEL gocd.version="20.6.0" \
+LABEL gocd.version="20.7.0" \
   description="GoCD server based on alpine version 3.11" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.6.0-12005" \
-  gocd.git.sha="12860aac6351e2a353728c7d7913f34d741c63e0"
+  gocd.full.version="20.7.0-12097" \
+  gocd.git.sha="f4f86ca8d433edaf9235ed92790c11e19d7be4ed"
 
 # the ports that go server runs on
 EXPOSE 8153
