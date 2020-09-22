@@ -22,28 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.7.0-12097/generic/go-server-20.7.0-12097.zip" > /tmp/go-server-20.7.0-12097.zip
-RUN unzip /tmp/go-server-20.7.0-12097.zip -d /
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.8.0-12213/generic/go-server-20.8.0-12213.zip" > /tmp/go-server-20.8.0-12213.zip
+RUN unzip /tmp/go-server-20.8.0-12213.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-20.7.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-20.7.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-20.7.0/lib /go-server/lib && \
-    mv /go-server-20.7.0/logs /go-server/logs && \
-    mv /go-server-20.7.0/run /go-server/run && \
-    mv /go-server-20.7.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-20.7.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.7.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.7.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-20.8.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-20.8.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-20.8.0/lib /go-server/lib && \
+    mv /go-server-20.8.0/logs /go-server/logs && \
+    mv /go-server-20.8.0/run /go-server/run && \
+    mv /go-server-20.8.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-20.8.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.8.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-20.8.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.11
 
-LABEL gocd.version="20.7.0" \
+LABEL gocd.version="20.8.0" \
   description="GoCD server based on alpine version 3.11" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.7.0-12097" \
-  gocd.git.sha="f4f86ca8d433edaf9235ed92790c11e19d7be4ed"
+  gocd.full.version="20.8.0-12213" \
+  gocd.git.sha="1e23a06e496205ced5f1a8e83d9b209fc0a290cb"
 
 # the ports that go server runs on
 EXPOSE 8153
@@ -101,7 +101,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.2%2B8/OpenJDK13U-jre_x64_linux_hotspot_13.0.2_8.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk14-binaries/releases/download/jdk-14.0.2%2B12/OpenJDK14U-jre_x64_linux_hotspot_14.0.2_12.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
