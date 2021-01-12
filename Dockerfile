@@ -1,4 +1,4 @@
-# Copyright 2020 ThoughtWorks, Inc.
+# Copyright 2021 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,28 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.10.0-12356/generic/go-server-20.10.0-12356.zip" > /tmp/go-server-20.10.0-12356.zip
-RUN unzip /tmp/go-server-20.10.0-12356.zip -d /
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.1.0-12439/generic/go-server-21.1.0-12439.zip" > /tmp/go-server-21.1.0-12439.zip
+RUN unzip /tmp/go-server-21.1.0-12439.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-20.10.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-20.10.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-20.10.0/lib /go-server/lib && \
-    mv /go-server-20.10.0/logs /go-server/logs && \
-    mv /go-server-20.10.0/run /go-server/run && \
-    mv /go-server-20.10.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-20.10.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.10.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-20.10.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-21.1.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-21.1.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-21.1.0/lib /go-server/lib && \
+    mv /go-server-21.1.0/logs /go-server/logs && \
+    mv /go-server-21.1.0/run /go-server/run && \
+    mv /go-server-21.1.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-21.1.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.1.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.11
 
-LABEL gocd.version="20.10.0" \
+LABEL gocd.version="21.1.0" \
   description="GoCD server based on alpine version 3.11" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.10.0-12356" \
-  gocd.git.sha="b16b6bc3f7ad3bb39e465ff2168d1cc66c95b4d5"
+  gocd.full.version="21.1.0-12439" \
+  gocd.git.sha="5a4959c7c4ede49165ec961b0219126cd5aa9e52"
 
 # the ports that go server runs on
 EXPOSE 8153
