@@ -22,28 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.1.0-12439/generic/go-server-21.1.0-12439.zip" > /tmp/go-server-21.1.0-12439.zip
-RUN unzip /tmp/go-server-21.1.0-12439.zip -d /
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.2.0-12498/generic/go-server-21.2.0-12498.zip" > /tmp/go-server-21.2.0-12498.zip
+RUN unzip /tmp/go-server-21.2.0-12498.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-21.1.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-21.1.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-21.1.0/lib /go-server/lib && \
-    mv /go-server-21.1.0/logs /go-server/logs && \
-    mv /go-server-21.1.0/run /go-server/run && \
-    mv /go-server-21.1.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-21.1.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.1.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-21.2.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-21.2.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-21.2.0/lib /go-server/lib && \
+    mv /go-server-21.2.0/logs /go-server/logs && \
+    mv /go-server-21.2.0/run /go-server/run && \
+    mv /go-server-21.2.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-21.2.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.2.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.2.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM alpine:3.11
 
-LABEL gocd.version="21.1.0" \
+LABEL gocd.version="21.2.0" \
   description="GoCD server based on alpine version 3.11" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.1.0-12439" \
-  gocd.git.sha="5a4959c7c4ede49165ec961b0219126cd5aa9e52"
+  gocd.full.version="21.2.0-12498" \
+  gocd.git.sha="16e1ac6956cd5177a99dc3fe33503661881c354f"
 
 # the ports that go server runs on
 EXPOSE 8153
@@ -64,7 +64,7 @@ RUN \
 # regardless of whatever dependencies get added
 # add user to root group for gocd to work on openshift
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-  apk add --no-cache cyrus-sasl cyrus-sasl-plain && \
+  apk add --no-cache libsasl && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
   # install glibc and zlib for adoptopenjdk && \
@@ -101,7 +101,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.1%2B9/OpenJDK15U-jre_x64_linux_hotspot_15.0.1_9.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.2%2B7/OpenJDK15U-jre_x64_linux_hotspot_15.0.2_7.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
