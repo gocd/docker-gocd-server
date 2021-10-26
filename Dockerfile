@@ -22,28 +22,28 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.2.0-12498/generic/go-server-21.2.0-12498.zip" > /tmp/go-server-21.2.0-12498.zip
-RUN unzip /tmp/go-server-21.2.0-12498.zip -d /
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.3.0-13067/generic/go-server-21.3.0-13067.zip" > /tmp/go-server-21.3.0-13067.zip
+RUN unzip /tmp/go-server-21.3.0-13067.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-21.2.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-21.2.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-21.2.0/lib /go-server/lib && \
-    mv /go-server-21.2.0/logs /go-server/logs && \
-    mv /go-server-21.2.0/run /go-server/run && \
-    mv /go-server-21.2.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-21.2.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.2.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.2.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-21.3.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-21.3.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-21.3.0/lib /go-server/lib && \
+    mv /go-server-21.3.0/logs /go-server/logs && \
+    mv /go-server-21.3.0/run /go-server/run && \
+    mv /go-server-21.3.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-21.3.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.3.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.3.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
-FROM alpine:3.11
+FROM alpine:3.13
 
-LABEL gocd.version="21.2.0" \
-  description="GoCD server based on alpine version 3.11" \
+LABEL gocd.version="21.3.0" \
+  description="GoCD server based on alpine version 3.13" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.2.0-12498" \
-  gocd.git.sha="16e1ac6956cd5177a99dc3fe33503661881c354f"
+  gocd.full.version="21.3.0-13067" \
+  gocd.git.sha="4c4bb4780eb0d3fc4cacfc4cfcc0b07e2eaf0595"
 
 # the ports that go server runs on
 EXPOSE 8153
