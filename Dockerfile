@@ -17,38 +17,36 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM alpine:latest as gocd-server-unzip
+FROM curlimages/curl:latest as gocd-server-unzip
+USER root
 ARG UID=1000
-RUN \
-  apk --no-cache upgrade && \
-  apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.3.0-13067/generic/go-server-21.3.0-13067.zip" > /tmp/go-server-21.3.0-13067.zip
-RUN unzip /tmp/go-server-21.3.0-13067.zip -d /
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.4.0-13469/generic/go-server-21.4.0-13469.zip" > /tmp/go-server-21.4.0-13469.zip
+RUN unzip /tmp/go-server-21.4.0-13469.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-21.3.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-21.3.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-21.3.0/lib /go-server/lib && \
-    mv /go-server-21.3.0/logs /go-server/logs && \
-    mv /go-server-21.3.0/run /go-server/run && \
-    mv /go-server-21.3.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-21.3.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.3.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.3.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-21.4.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-21.4.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-21.4.0/lib /go-server/lib && \
+    mv /go-server-21.4.0/logs /go-server/logs && \
+    mv /go-server-21.4.0/run /go-server/run && \
+    mv /go-server-21.4.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-21.4.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.4.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-21.4.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
-FROM alpine:3.13
+FROM docker.io/alpine:3.14
 
-LABEL gocd.version="21.3.0" \
-  description="GoCD server based on alpine version 3.13" \
+LABEL gocd.version="21.4.0" \
+  description="GoCD server based on docker.io/alpine:3.14" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.3.0-13067" \
-  gocd.git.sha="4c4bb4780eb0d3fc4cacfc4cfcc0b07e2eaf0595"
+  gocd.full.version="21.4.0-13469" \
+  gocd.git.sha="f3b865c5018dec2bddf98496e0e74e8e70a80cb6"
 
 # the ports that go server runs on
 EXPOSE 8153
 
-ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
+ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-amd64 /usr/local/sbin/tini
 
 # force encoding
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
