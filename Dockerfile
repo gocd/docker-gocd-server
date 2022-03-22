@@ -1,4 +1,4 @@
-# Copyright 2021 ThoughtWorks, Inc.
+# Copyright 2022 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,28 +20,28 @@
 FROM curlimages/curl:latest as gocd-server-unzip
 USER root
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.4.0-13469/generic/go-server-21.4.0-13469.zip" > /tmp/go-server-21.4.0-13469.zip
-RUN unzip /tmp/go-server-21.4.0-13469.zip -d /
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/22.1.0-13913/generic/go-server-22.1.0-13913.zip" > /tmp/go-server-22.1.0-13913.zip
+RUN unzip /tmp/go-server-22.1.0-13913.zip -d /
 RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-21.4.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-21.4.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-21.4.0/lib /go-server/lib && \
-    mv /go-server-21.4.0/logs /go-server/logs && \
-    mv /go-server-21.4.0/run /go-server/run && \
-    mv /go-server-21.4.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-21.4.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.4.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-21.4.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv /go-server-22.1.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-22.1.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-22.1.0/lib /go-server/lib && \
+    mv /go-server-22.1.0/logs /go-server/logs && \
+    mv /go-server-22.1.0/run /go-server/run && \
+    mv /go-server-22.1.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-22.1.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-22.1.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-22.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
-FROM docker.io/alpine:3.14
+FROM docker.io/alpine:3.15
 
-LABEL gocd.version="21.4.0" \
-  description="GoCD server based on docker.io/alpine:3.14" \
+LABEL gocd.version="22.1.0" \
+  description="GoCD server based on docker.io/alpine:3.15" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.4.0-13469" \
-  gocd.git.sha="f3b865c5018dec2bddf98496e0e74e8e70a80cb6"
+  gocd.full.version="22.1.0-13913" \
+  gocd.git.sha="f4c9c1650e2e27fe0a9962faa39536f94f57e297"
 
 # the ports that go server runs on
 EXPOSE 8153
@@ -99,7 +99,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.2%2B7/OpenJDK15U-jre_x64_linux_hotspot_15.0.2_7.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.2_8.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
