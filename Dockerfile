@@ -20,28 +20,28 @@
 FROM curlimages/curl:latest as gocd-server-unzip
 USER root
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/22.2.0-14697/generic/go-server-22.2.0-14697.zip" > /tmp/go-server-22.2.0-14697.zip
-RUN unzip /tmp/go-server-22.2.0-14697.zip -d /
-RUN mkdir -p /go-server/wrapper /go-server/bin && \
-    mv /go-server-22.2.0/LICENSE /go-server/LICENSE && \
-    mv /go-server-22.2.0/bin/go-server /go-server/bin/go-server && \
-    mv /go-server-22.2.0/lib /go-server/lib && \
-    mv /go-server-22.2.0/logs /go-server/logs && \
-    mv /go-server-22.2.0/run /go-server/run && \
-    mv /go-server-22.2.0/wrapper-config /go-server/wrapper-config && \
-    mv /go-server-22.2.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-22.2.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
-    mv /go-server-22.2.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/22.3.0-15301/generic/go-server-22.3.0-15301.zip" > /tmp/go-server-22.3.0-15301.zip && \
+    unzip /tmp/go-server-22.3.0-15301.zip -d / && \
+    mkdir -p /go-server/wrapper /go-server/bin && \
+    mv /go-server-22.3.0/LICENSE /go-server/LICENSE && \
+    mv /go-server-22.3.0/bin/go-server /go-server/bin/go-server && \
+    mv /go-server-22.3.0/lib /go-server/lib && \
+    mv /go-server-22.3.0/logs /go-server/logs && \
+    mv /go-server-22.3.0/run /go-server/run && \
+    mv /go-server-22.3.0/wrapper-config /go-server/wrapper-config && \
+    mv /go-server-22.3.0/wrapper/wrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-22.3.0/wrapper/libwrapper-linux* /go-server/wrapper/ && \
+    mv /go-server-22.3.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM docker.io/alpine:3.16
 
-LABEL gocd.version="22.2.0" \
+LABEL gocd.version="22.3.0" \
   description="GoCD server based on docker.io/alpine:3.16" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="22.2.0-14697" \
-  gocd.git.sha="4bdda4e0d769e66da651926c7066979740bd7ae7"
+  gocd.full.version="22.3.0-15301" \
+  gocd.git.sha="9d23ed19a9ea46eaf7f18bd16671ae0569871f53"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
@@ -64,41 +64,42 @@ RUN \
   adduser -D -u ${UID} -s /bin/bash -G root go && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
-  # install glibc and zlib for adoptopenjdk && \
-  # See https://github.com/AdoptOpenJDK/openjdk-docker/blob/ce8b120411b131e283106ab89ea5921ebb1d1759/8/jdk/alpine/Dockerfile.hotspot.releases.slim#L24-L54 && \
-    apk add --no-cache --virtual .build-deps binutils && \
-    GLIBC_VER="2.29-r0" && \
+  # install glibc/gcc-libs/zlib for the Tanuki Wrapper, and use by glibc-linked Adoptium JREs && \
+    apk add --no-cache tzdata --virtual .build-deps curl binutils zstd && \
+    GLIBC_VER="2.34-r0" && \
     ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-9.1.0-2-x86_64.pkg.tar.xz" && \
-    GCC_LIBS_SHA256=91dba90f3c20d32fcf7f1dbe91523653018aa0b8d2230b00f822f6722804cf08 && \
-    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.2.11-3-x86_64.pkg.tar.xz" && \
-    ZLIB_SHA256=17aede0b9f8baa789c5aa3f358fbf8c68a5f1228c5e6cba1a5dd34102ef4d4e5 && \
+    GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-10.2.0-6-x86_64.pkg.tar.zst" && \
+    GCC_LIBS_SHA256="e33b45e4a10ef26259d6acf8e7b5dd6dc63800641e41eb67fa6588d061f79c1c" && \
+    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.2.12-2-x86_64.pkg.tar.zst" && \
+    ZLIB_SHA256=506577ab283c0e5dafaa61d645994c38560234a871fbc9ef2b45327a9a965d66 && \
     curl -LfsS https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub && \
     SGERRAND_RSA_SHA256="823b54589c93b02497f1ba4dc622eaef9c813e6b0f0ebbb2f771e32adf9f4ef2" && \
     echo "${SGERRAND_RSA_SHA256} */etc/apk/keys/sgerrand.rsa.pub" | sha256sum -c - && \
     curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-${GLIBC_VER}.apk > /tmp/glibc-${GLIBC_VER}.apk && \
-    apk add /tmp/glibc-${GLIBC_VER}.apk && \
+    apk add --no-cache --force-overwrite /tmp/glibc-${GLIBC_VER}.apk && \
     curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-bin-${GLIBC_VER}.apk > /tmp/glibc-bin-${GLIBC_VER}.apk && \
-    apk add /tmp/glibc-bin-${GLIBC_VER}.apk && \
+    apk add --no-cache /tmp/glibc-bin-${GLIBC_VER}.apk && \
     curl -Ls ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-i18n-${GLIBC_VER}.apk > /tmp/glibc-i18n-${GLIBC_VER}.apk && \
-    apk add /tmp/glibc-i18n-${GLIBC_VER}.apk && \
+    apk add --no-cache /tmp/glibc-i18n-${GLIBC_VER}.apk && \
     /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
-    curl -LfsS ${GCC_LIBS_URL} -o /tmp/gcc-libs.tar.xz && \
-    echo "${GCC_LIBS_SHA256} */tmp/gcc-libs.tar.xz" | sha256sum -c - && \
+    curl -LfsS ${GCC_LIBS_URL} -o /tmp/gcc-libs.tar.zst && \
+    echo "${GCC_LIBS_SHA256} */tmp/gcc-libs.tar.zst" | sha256sum -c - && \
     mkdir /tmp/gcc && \
-    tar -xf /tmp/gcc-libs.tar.xz -C /tmp/gcc && \
+    zstd -d /tmp/gcc-libs.tar.zst --output-dir-flat /tmp && \
+    tar -xf /tmp/gcc-libs.tar -C /tmp/gcc && \
     mv /tmp/gcc/usr/lib/libgcc* /tmp/gcc/usr/lib/libstdc++* /usr/glibc-compat/lib && \
     strip /usr/glibc-compat/lib/libgcc_s.so.* /usr/glibc-compat/lib/libstdc++.so* && \
-    curl -LfsS ${ZLIB_URL} -o /tmp/libz.tar.xz && \
-    echo "${ZLIB_SHA256} */tmp/libz.tar.xz" | sha256sum -c - && \
+    curl -LfsS ${ZLIB_URL} -o /tmp/libz.tar.zst && \
+    echo "${ZLIB_SHA256} */tmp/libz.tar.zst" | sha256sum -c - && \
     mkdir /tmp/libz && \
-    tar -xf /tmp/libz.tar.xz -C /tmp/libz && \
+    zstd -d /tmp/libz.tar.zst --output-dir-flat /tmp && \
+    tar -xf /tmp/libz.tar -C /tmp/libz && \
     mv /tmp/libz/usr/lib/libz.so* /usr/glibc-compat/lib && \
     apk del --purge .build-deps glibc-i18n && \
-    rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
-  # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.4_8.tar.gz' --output /tmp/jre.tar.gz && \
+    rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar* /tmp/libz /tmp/libz.tar* /var/cache/apk/* && \
+  # end installing glibc/gcc-libs/zlib && \
+  curl --fail --location --silent --show-error 'https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
@@ -111,8 +112,8 @@ COPY --from=gocd-server-unzip /go-server /go-server
 COPY --chown=go:root logback-include.xml /go-server/config/logback-include.xml
 COPY --chown=go:root install-gocd-plugins git-clone-config /usr/local/sbin/
 
-RUN chown -R go:root /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh \
-    && chmod -R g=u /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh
+RUN chown -R go:root /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh && \
+    chmod -R g=u /docker-entrypoint.d /go-working-dir /godata /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
