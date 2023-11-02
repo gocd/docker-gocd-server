@@ -21,30 +21,30 @@ FROM curlimages/curl:latest as gocd-server-unzip
 USER root
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/23.3.0-16991/generic/go-server-23.3.0-16991.zip" > /tmp/go-server-23.3.0-16991.zip && \
-    unzip -q /tmp/go-server-23.3.0-16991.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/23.4.0-17731/generic/go-server-23.4.0-17731.zip" > /tmp/go-server-23.4.0-17731.zip && \
+    unzip -q /tmp/go-server-23.4.0-17731.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-23.3.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-23.3.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-23.3.0/lib /go-server/lib && \
-    mv -v /go-server-23.3.0/logs /go-server/logs && \
-    mv -v /go-server-23.3.0/run /go-server/run && \
-    mv -v /go-server-23.3.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-23.4.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-23.4.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-23.4.0/lib /go-server/lib && \
+    mv -v /go-server-23.4.0/logs /go-server/logs && \
+    mv -v /go-server-23.4.0/run /go-server/run && \
+    mv -v /go-server-23.4.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-23.3.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.3.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.3.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-23.4.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-23.4.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-23.4.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM docker.io/alpine:3.18
 ARG TARGETARCH
 
-LABEL gocd.version="23.3.0" \
+LABEL gocd.version="23.4.0" \
   description="GoCD server based on docker.io/alpine:3.18" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="23.3.0-16991" \
-  gocd.git.sha="f38981e8aa684d63ac96f517996cd888eff37640"
+  gocd.full.version="23.4.0-17731" \
+  gocd.git.sha="4deb96d823b921419680560be080588e900d406e"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
@@ -64,13 +64,13 @@ RUN \
   apk --no-cache upgrade && \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-  apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
+  apk add --no-cache git openssh-client bash curl procps && \
   # install glibc/zlib for the Tanuki Wrapper, and use by glibc-linked Adoptium JREs && \
     apk add --no-cache tzdata --virtual .build-deps curl binutils zstd && \
     GLIBC_VER="2.34-r0" && \
     ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.2.13-2-x86_64.pkg.tar.zst" && \
-    ZLIB_SHA256=c4f394724b20b84d7304b23bbb58442b6ef53e5cbac89eb51e39d7f0a46abafd && \
+    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.3-2-x86_64.pkg.tar.zst" && \
+    ZLIB_SHA256=805ad81ea00486717df264b05567a4a0b812a484a7482110b6159fbea6dc7e63 && \
     curl -LfsS https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub && \
     SGERRAND_RSA_SHA256="823b54589c93b02497f1ba4dc622eaef9c813e6b0f0ebbb2f771e32adf9f4ef2" && \
     echo "${SGERRAND_RSA_SHA256} */etc/apk/keys/sgerrand.rsa.pub" | sha256sum -c - && \
@@ -91,7 +91,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/libz /tmp/libz.tar* /var/cache/apk/* && \
   # end installing glibc/zlib && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.8_7.tar.gz" --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.9_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
