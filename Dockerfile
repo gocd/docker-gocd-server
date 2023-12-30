@@ -21,30 +21,30 @@ FROM curlimages/curl:latest as gocd-server-unzip
 USER root
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/23.4.0-17731/generic/go-server-23.4.0-17731.zip" > /tmp/go-server-23.4.0-17731.zip && \
-    unzip -q /tmp/go-server-23.4.0-17731.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/23.5.0-18179/generic/go-server-23.5.0-18179.zip" > /tmp/go-server-23.5.0-18179.zip && \
+    unzip -q /tmp/go-server-23.5.0-18179.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-23.4.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-23.4.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-23.4.0/lib /go-server/lib && \
-    mv -v /go-server-23.4.0/logs /go-server/logs && \
-    mv -v /go-server-23.4.0/run /go-server/run && \
-    mv -v /go-server-23.4.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-23.5.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-23.5.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-23.5.0/lib /go-server/lib && \
+    mv -v /go-server-23.5.0/logs /go-server/logs && \
+    mv -v /go-server-23.5.0/run /go-server/run && \
+    mv -v /go-server-23.5.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-23.4.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.4.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.4.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-23.5.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-23.5.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-23.5.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
-FROM docker.io/alpine:3.18
+FROM docker.io/alpine:3.19
 ARG TARGETARCH
 
-LABEL gocd.version="23.4.0" \
-  description="GoCD server based on docker.io/alpine:3.18" \
+LABEL gocd.version="23.5.0" \
+  description="GoCD server based on docker.io/alpine:3.19" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="23.4.0-17731" \
-  gocd.git.sha="4deb96d823b921419680560be080588e900d406e"
+  gocd.full.version="23.5.0-18179" \
+  gocd.git.sha="7702b283accd1f90f014f0087aa2e9bd8baf4a97"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
