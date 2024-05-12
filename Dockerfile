@@ -1,4 +1,4 @@
-# Copyright 2023 Thoughtworks, Inc.
+# Copyright 2024 Thoughtworks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,30 +21,30 @@ FROM curlimages/curl:latest as gocd-server-unzip
 USER root
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/23.5.0-18179/generic/go-server-23.5.0-18179.zip" > /tmp/go-server-23.5.0-18179.zip && \
-    unzip -q /tmp/go-server-23.5.0-18179.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.1.0-18867/generic/go-server-24.1.0-18867.zip" > /tmp/go-server-24.1.0-18867.zip && \
+    unzip -q /tmp/go-server-24.1.0-18867.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-23.5.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-23.5.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-23.5.0/lib /go-server/lib && \
-    mv -v /go-server-23.5.0/logs /go-server/logs && \
-    mv -v /go-server-23.5.0/run /go-server/run && \
-    mv -v /go-server-23.5.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-24.1.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-24.1.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-24.1.0/lib /go-server/lib && \
+    mv -v /go-server-24.1.0/logs /go-server/logs && \
+    mv -v /go-server-24.1.0/run /go-server/run && \
+    mv -v /go-server-24.1.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-23.5.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.5.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-23.5.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-24.1.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-24.1.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-24.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
-FROM docker.io/alpine:3.19
+FROM cgr.dev/chainguard/wolfi-base
 ARG TARGETARCH
 
-LABEL gocd.version="23.5.0" \
-  description="GoCD server based on docker.io/alpine:3.19" \
+LABEL gocd.version="24.1.0" \
+  description="GoCD server based on cgr.dev/chainguard/wolfi-base" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="23.5.0-18179" \
-  gocd.git.sha="7702b283accd1f90f014f0087aa2e9bd8baf4a97"
+  gocd.full.version="24.1.0-18867" \
+  gocd.git.sha="a60529cdf34a96de310bc05e2041f2ac23014707"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
@@ -61,37 +61,10 @@ RUN \
 # add mode and permissions for files we added above
   chmod 0755 /usr/local/sbin/tini && \
   chown root:root /usr/local/sbin/tini && \
-  apk --no-cache upgrade && \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-  apk add --no-cache git openssh-client bash curl procps && \
-  # install glibc/zlib for the Tanuki Wrapper, and use by glibc-linked Adoptium JREs && \
-    apk add --no-cache tzdata --virtual .build-deps curl binutils zstd && \
-    GLIBC_VER="2.34-r0" && \
-    ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    ZLIB_URL="https://archive.archlinux.org/packages/z/zlib/zlib-1%3A1.3-2-x86_64.pkg.tar.zst" && \
-    ZLIB_SHA256=805ad81ea00486717df264b05567a4a0b812a484a7482110b6159fbea6dc7e63 && \
-    curl -LfsS https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub && \
-    SGERRAND_RSA_SHA256="823b54589c93b02497f1ba4dc622eaef9c813e6b0f0ebbb2f771e32adf9f4ef2" && \
-    echo "${SGERRAND_RSA_SHA256} */etc/apk/keys/sgerrand.rsa.pub" | sha256sum -c - && \
-    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-${GLIBC_VER}.apk > /tmp/glibc-${GLIBC_VER}.apk && \
-    apk add --no-cache --force-overwrite /tmp/glibc-${GLIBC_VER}.apk && \
-    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-bin-${GLIBC_VER}.apk > /tmp/glibc-bin-${GLIBC_VER}.apk && \
-    apk add --no-cache /tmp/glibc-bin-${GLIBC_VER}.apk && \
-    curl -Ls ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-i18n-${GLIBC_VER}.apk > /tmp/glibc-i18n-${GLIBC_VER}.apk && \
-    apk add --no-cache /tmp/glibc-i18n-${GLIBC_VER}.apk && \
-    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true && \
-    echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
-    curl -LfsS ${ZLIB_URL} -o /tmp/libz.tar.zst && \
-    echo "${ZLIB_SHA256} */tmp/libz.tar.zst" | sha256sum -c - && \
-    mkdir /tmp/libz && \
-    zstd -d /tmp/libz.tar.zst --output-dir-flat /tmp && \
-    tar -xf /tmp/libz.tar -C /tmp/libz && \
-    mv /tmp/libz/usr/lib/libz.so* /usr/glibc-compat/lib && \
-    apk del --purge .build-deps glibc-i18n && \
-    rm -rf /tmp/*.apk /tmp/libz /tmp/libz.tar* /var/cache/apk/* && \
-  # end installing glibc/zlib && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.9_9.tar.gz" --output /tmp/jre.tar.gz && \
+  apk add --no-cache git openssh-client bash curl procps glibc-locale-en && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.11%2B9/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.11_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
