@@ -17,34 +17,34 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM curlimages/curl:latest as gocd-server-unzip
+FROM curlimages/curl:latest AS gocd-server-unzip
 USER root
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.1.0-18867/generic/go-server-24.1.0-18867.zip" > /tmp/go-server-24.1.0-18867.zip && \
-    unzip -q /tmp/go-server-24.1.0-18867.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.2.0-19076/generic/go-server-24.2.0-19076.zip" > /tmp/go-server-24.2.0-19076.zip && \
+    unzip -q /tmp/go-server-24.2.0-19076.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-24.1.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-24.1.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-24.1.0/lib /go-server/lib && \
-    mv -v /go-server-24.1.0/logs /go-server/logs && \
-    mv -v /go-server-24.1.0/run /go-server/run && \
-    mv -v /go-server-24.1.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-24.2.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-24.2.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-24.2.0/lib /go-server/lib && \
+    mv -v /go-server-24.2.0/logs /go-server/logs && \
+    mv -v /go-server-24.2.0/run /go-server/run && \
+    mv -v /go-server-24.2.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-24.1.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-24.1.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-24.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-24.2.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-24.2.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-24.2.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM cgr.dev/chainguard/wolfi-base
 ARG TARGETARCH
 
-LABEL gocd.version="24.1.0" \
+LABEL gocd.version="24.2.0" \
   description="GoCD server based on cgr.dev/chainguard/wolfi-base" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="24.1.0-18867" \
-  gocd.git.sha="a60529cdf34a96de310bc05e2041f2ac23014707"
+  gocd.full.version="24.2.0-19076" \
+  gocd.git.sha="1406870fc6e121194028e55c4facc0c638d70007"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
@@ -64,7 +64,7 @@ RUN \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
   apk add --no-cache git openssh-client bash curl procps glibc-locale-en && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.11%2B9/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.11_9.tar.gz" --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.3_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
