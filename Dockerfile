@@ -20,30 +20,30 @@
 FROM cgr.dev/chainguard/bash:latest AS gocd-server-unzip
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/25.2.0-20485/generic/go-server-25.2.0-20485.zip" > /tmp/go-server-25.2.0-20485.zip && \
-    unzip -q /tmp/go-server-25.2.0-20485.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/25.3.0-20862/generic/go-server-25.3.0-20862.zip" > /tmp/go-server-25.3.0-20862.zip && \
+    unzip -q /tmp/go-server-25.3.0-20862.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-25.2.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-25.2.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-25.2.0/lib /go-server/lib && \
-    mv -v /go-server-25.2.0/logs /go-server/logs && \
-    mv -v /go-server-25.2.0/run /go-server/run && \
-    mv -v /go-server-25.2.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-25.3.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-25.3.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-25.3.0/lib /go-server/lib && \
+    mv -v /go-server-25.3.0/logs /go-server/logs && \
+    mv -v /go-server-25.3.0/run /go-server/run && \
+    mv -v /go-server-25.3.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-25.2.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-25.2.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-25.2.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-25.3.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-25.3.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-25.3.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM cgr.dev/chainguard/wolfi-base
 ARG TARGETARCH
 
-LABEL gocd.version="25.2.0" \
+LABEL gocd.version="25.3.0" \
   description="GoCD server based on cgr.dev/chainguard/wolfi-base" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="25.2.0-20485" \
-  gocd.git.sha="2720963f2a829313e1f7922fc430682259e36a6d"
+  gocd.full.version="25.3.0-20862" \
+  gocd.git.sha="e48df223c27445d22c88cd58e5218bebd4fa9496"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
@@ -64,7 +64,7 @@ RUN \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
   apk add --no-cache git openssh-client bash curl procps glibc-locale-en && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.7_6.tar.gz" --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.8%2B9/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.8_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
