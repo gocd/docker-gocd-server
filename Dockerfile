@@ -17,38 +17,36 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM chainguard/bash:latest AS gocd-server-unzip
+FROM docker.io/chainguard/bash:latest AS gocd-server-unzip
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/25.4.0-21793/generic/go-server-25.4.0-21793.zip" > /tmp/go-server-25.4.0-21793.zip && \
-    unzip -q /tmp/go-server-25.4.0-21793.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/26.1.0-22803/generic/go-server-26.1.0-22803.zip" > /tmp/go-server-26.1.0-22803.zip && \
+    unzip -q /tmp/go-server-26.1.0-22803.zip -d / && \
     mkdir -p /go-server/wrapper /go-server/bin && \
-    mv -v /go-server-25.4.0/LICENSE /go-server/LICENSE && \
-    mv -v /go-server-25.4.0/bin/go-server /go-server/bin/go-server && \
-    mv -v /go-server-25.4.0/lib /go-server/lib && \
-    mv -v /go-server-25.4.0/logs /go-server/logs && \
-    mv -v /go-server-25.4.0/run /go-server/run && \
-    mv -v /go-server-25.4.0/wrapper-config /go-server/wrapper-config && \
+    mv -v /go-server-26.1.0/LICENSE /go-server/LICENSE && \
+    mv -v /go-server-26.1.0/bin/go-server /go-server/bin/go-server && \
+    mv -v /go-server-26.1.0/lib /go-server/lib && \
+    mv -v /go-server-26.1.0/logs /go-server/logs && \
+    mv -v /go-server-26.1.0/run /go-server/run && \
+    mv -v /go-server-26.1.0/wrapper-config /go-server/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-server-25.4.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-25.4.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
-    mv -v /go-server-25.4.0/wrapper/wrapper.jar /go-server/wrapper/ && \
+    mv -v /go-server-26.1.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-26.1.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-server/wrapper/ && \
+    mv -v /go-server-26.1.0/wrapper/wrapper.jar /go-server/wrapper/ && \
     chown -R ${UID}:0 /go-server && chmod -R g=u /go-server
 
 FROM docker.io/chainguard/wolfi-base
 ARG TARGETARCH
 
-LABEL gocd.version="25.4.0" \
+LABEL gocd.version="26.1.0" \
   description="GoCD server based on docker.io/chainguard/wolfi-base" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="25.4.0-21793" \
-  gocd.git.sha="c8358258163d7b9833ab3b18a2f459999936b03a"
+  gocd.full.version="26.1.0-22803" \
+  gocd.git.sha="55b7b460510bb739c1ae6d226ff7fb650596dca2"
 
 # the ports that GoCD server runs on
 EXPOSE 8153
-
-ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${TARGETARCH} /usr/local/sbin/tini
 
 # force encoding
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
@@ -57,14 +55,11 @@ ENV GO_JAVA_HOME="/gocd-jre"
 ARG UID=1000
 
 RUN \
-# add mode and permissions for files we added above
-  chmod 0755 /usr/local/sbin/tini && \
-  chown root:root /usr/local/sbin/tini && \
   apk --no-cache upgrade && \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-  apk add --no-cache git openssh-client bash curl procps glibc-locale-en && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_25.0.1_8.tar.gz" --output /tmp/jre.tar.gz && \
+  apk add --no-cache tini-static git openssh-client bash curl procps glibc-locale-en && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.3%2B9/OpenJDK25U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_25.0.3_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
@@ -82,6 +77,6 @@ RUN chown -R go:root /docker-entrypoint.d /go-working-dir /godata /docker-entryp
 VOLUME /go-working-dir
 VOLUME /godata
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["tini-static", "-g", "--", "/docker-entrypoint.sh"]
 
 USER go
